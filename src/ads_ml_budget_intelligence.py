@@ -1,6 +1,6 @@
 
 """
-Vicco Ads ML Budget Intelligence Pipeline
+Ads ML Budget Intelligence Pipeline
 
 This project is a Python-based predictive decision-support pipeline that integrates
 Google Ads data to evaluate campaign performance, forecast future results, simulate
