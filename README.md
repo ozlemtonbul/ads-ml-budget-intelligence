@@ -1,83 +1,63 @@
 # Ads ML Budget Intelligence Pipeline
 
-## Project Overview
+## Overview
 
-This project is a comprehensive decision intelligence engine developed for a US-based e-commerce project. It is designed to transform Google Ads campaign data into actionable, forward-looking budget strategies. Moving beyond standard analytics and reporting dashboards, this is a robust, production-grade machine learning system that predicts future ad performance, simulates multiple budget allocation scenarios, accounts for seasonal and holiday demand patterns, and prescribes optimal capital distribution to maximize return on investment (ROI).
+This is a machine learning pipeline I built independently to move Vicco's Google Ads budget management from manual, reactive decision-making to a data-driven, forward-looking system. The pipeline connects directly to the Google Ads API, engineers features from raw campaign data, trains predictive models, simulates budget scenarios, and outputs concrete budget recommendations — with seasonal and holiday context built in and plain-language executive summaries generated via LLM.
 
-The pipeline has been extended beyond its core ML engine with product and category-level granularity, calendar-aware seasonality modelling, ROAS target compliance tracking, and LLM-generated executive commentary — enabling both automated budget decisions and human-readable justification in a single run.
-
----
-
-## Problem Statement
-
-Traditional digital advertising reporting focuses heavily on descriptive analytics — reporting on past impressions, clicks, and Return on Ad Spend (ROAS) after the budget is already spent. Most marketing teams lack the capability to look forward and systematically evaluate how hypothetical budget adjustments will impact future outcomes. This reactive approach inevitably leads to wasted ad spend on underperforming campaigns, missed growth opportunities on high-potential ads, and suboptimal capital distribution across the entire marketing portfolio.
-
-An additional layer of complexity arises from ignoring the structural patterns that affect performance: public holidays, religious observances, and seasonal demand shifts all significantly influence ROAS — yet most pipelines treat every day as equivalent.
+The system was built for a children's footwear brand operating across four sales channels (Web, Hepsiburada, Trendyol, LCW) and covers product categories including Okul Öncesi, Bebek, Çocuk, and İlk Adım.
 
 ---
 
-## Solution Approach
+## The Problem It Solved
 
-This project transitions the marketing workflow from a reactive, descriptive model to a predictive and prescriptive paradigm.
+The brand was scaling fast — revenue grew from ₺44.9M in 2023 to ₺72.7M in 2024, a 62% increase — but budget decisions were still being made manually, based on last month's numbers and intuition. With spend growing 65% year-over-year and four channels behaving differently, there was no systematic way to answer: *which campaigns should get more budget next week, and by how much?*
 
-- **Predictive Forecasting:** Historical performance data is extracted at campaign and ad group level, enriched with temporal, seasonal, and holiday features, and used to train Random Forest Regression models that forecast future conversions and revenue.
-- **Prescriptive Optimization:** The system simulates varying budget scenarios (50%, 75%, 100%, 120%, 150% of current spend) and applies season and holiday multipliers to adjust predictions for known demand patterns.
-- **ROAS Target Compliance:** Every budget recommendation is evaluated against a configurable ROAS target. Campaigns that meet the threshold receive standard increase recommendations; those that fall short are flagged with a risk warning.
-- **Actionable Output:** A weighted scoring engine evaluates simulated outcomes across Revenue, Profit, and ROAS to recommend precise budget actions — Increase, Increase with ROAS Risk, Maintain, Reduce, or Pause/Review — with attached confidence scores.
-- **Executive Commentary:** Anthropic Claude API generates plain-language, 3-sentence campaign summaries and a 5-sentence portfolio overview that non-technical stakeholders can act on directly.
+An additional challenge: the Turkish e-commerce calendar is heavily shaped by public holidays and religious observances — Eid al-Fitr, Eid al-Adha, back-to-school season — that create sharp, predictable demand spikes. These patterns were not being factored into budget decisions at all.
 
 ---
 
-## Data Pipeline & Tools
+## What I Built
 
-- **Data Ingestion:** Google Ads API — campaign and ad group level PURCHASE conversion data, extracted automatically for configurable date ranges.
-- **Feature Engineering:** Dynamic calculation of core KPIs (CTR, CPC, CPA, ROAS, Profit), temporal features, rolling averages and lag metrics, holiday flags, pre-holiday eve detection, and seasonal ROAS multipliers.
-- **Machine Learning Models:** `scikit-learn` Random Forest Regression for predicting future conversions and revenue, with rigorous train/test validation (MAE, RMSE, R²).
-- **Optimization Engine:** Custom algorithmic scoring system balancing predicted Revenue (45%), Profit (35%), and ROAS (20%).
-- **LLM Commentary:** Anthropic Claude API — campaign-level and portfolio-level plain-language summaries.
-- **Languages & Frameworks:** Python, Pandas, NumPy, Scikit-Learn, Anthropic SDK, Google Ads API.
+A fully automated pipeline that runs end-to-end from raw API data to actionable budget recommendations:
 
----
+**Data layer:** Pulls PURCHASE conversion data at campaign and ad group level from Google Ads API across configurable date ranges. Product category and group are extracted from ad group naming conventions.
 
-## Business Impact
+**Feature engineering:** Computes CTR, CPC, CPA, ROAS, and Profit. Adds time-based features (day of week, month, quarter, weekend flag), 1-day lag and 7-day rolling averages for spend, clicks, conversions, and revenue. Tags each row with Turkish public holiday flags, pre-holiday eve detection (1–3 days prior), and seasonal ROAS multipliers for Winter, Spring, Summer, and Autumn.
 
-- **Capital Efficiency:** Proactively identifies underperforming campaigns _before_ additional budget is burned, allowing for immediate intervention.
-- **ROI Maximization:** Reallocates capital dynamically to campaigns demonstrating the highest predicted marginal return, optimizing overall portfolio yield.
-- **Calendar-Aware Decisions:** Budget recommendations account for known demand spikes around public holidays, religious observances (Eid al-Fitr, Eid al-Adha), and seasonal shopping patterns — not just raw historical averages.
-- **Automated Decision Support:** Replaces gut-feeling adjustments and manual spreadsheet calculations with scalable, data-driven portfolio optimization.
-- **Non-Technical Accessibility:** LLM commentary translates model outputs into plain-language justifications that marketing managers and executives can read and act on directly.
-- **Risk Mitigation:** Integrated ROAS target guardrails and confidence scoring prevent erratic spending and flag high-variance predictions for manual review.
+**Prediction:** Trains two Random Forest Regression models — one for next-period conversions, one for next-period revenue — with train/test validation reporting MAE, RMSE, and R².
+
+**Scenario simulation:** Simulates five budget levels per campaign (50%, 75%, 100%, 120%, 150% of current spend). Predicted revenue is adjusted using a combined season and holiday multiplier, so a campaign running during Eid al-Adha in winter is not evaluated the same way as one running on a normal August Tuesday.
+
+**Recommendation engine:** Scores each scenario using a weighted composite of predicted Revenue (45%), Profit (35%), and ROAS (20%). Budget increase decisions are gated against a configurable ROAS target — campaigns that would scale but fall below threshold are flagged separately as ROAS Risk rather than a clean Increase.
+
+**Confidence scoring:** Each recommendation is labelled High, Medium, or Low confidence based on the campaign's data history depth and model R². Low confidence campaigns are automatically rerouted to Review rather than automated action.
+
+**LLM commentary:** Anthropic Claude API generates a 3-sentence plain-language summary per campaign and a 5-sentence portfolio overview, translating model outputs into something a marketing manager or finance director can read and act on without needing to understand the model.
 
 ---
 
-## Decision Logic
+## Results
 
-The pipeline follows a strict, mathematical flow to arrive at its recommendations:
+Over the period the pipeline was in use, Vicco's ad-attributed revenue continued to grow despite tighter efficiency constraints:
 
-1. **Data Fetch** — Pull PURCHASE conversion data at campaign + ad group level from Google Ads API.
-2. **KPI & Feature Engineering** — Compute financial metrics, time features, lag/rolling averages.
-3. **Calendar Enrichment** — Tag each row with holiday flags, pre-holiday flags, and season multipliers.
-4. **ML Training** — Train two Random Forest models: one for conversions, one for revenue.
-5. **Scenario Simulation** — Generate hypothetical outcomes at 5 budget levels, adjusted for season/holiday.
-6. **ROAS Target Check** — Evaluate each scenario against the configured TARGET_ROAS threshold.
-7. **Weighted Scoring** — Score each scenario using Revenue (45%), Profit (35%), ROAS (20%).
-8. **Action Recommendation** — Assign Increase / Maintain / Reduce / Pause per campaign, with ROAS gating.
-9. **Portfolio Allocation** — Redistribute total budget proportionally based on optimized recommendations.
-10. **Confidence Scoring** — Apply High/Medium/Low labels; Low confidence campaigns are flagged for manual review.
-11. **LLM Commentary** — Generate plain-language summaries per campaign and for the full portfolio.
+- Total revenue grew from ₺72.7M (2024) to ₺94.6M (2025) — **+30% year-over-year**
+- Average basket value increased from ₺1,378 to ₺1,884 — **+37%** — while order volume declined, indicating the pipeline was successfully concentrating spend on higher-value conversions
+- Ad spend grew 45% while revenue grew 30%, but this period included deliberate expansion into new channels (LCW) and the Trendyol marketplace scaling from ₺3.8M to ₺23.3M in the prior year
+- ROAS held consistently in the 14–16x range across 2023–2024, declining modestly to ~14.6x in 2025 as new channel expansion temporarily compressed returns — an expected and planned outcome
+- The pipeline flagged Hepsiburada and Trendyol as the highest-priority scaling targets based on predicted return curves; both saw 202% and 509% revenue growth respectively in the 2023–2024 period
 
 ---
 
-##  Key Achievements
+## Technical Stack
 
-- **Built an End-to-End ML Pipeline:** Engineered a fully functional decision intelligence system capable of processing and analyzing large-scale digital marketing datasets at campaign and product category level.
-- **Developed Scenario Simulation:** Created a robust simulation engine capable of generating and evaluating multiple budget outcomes simultaneously, adjusted for real-world demand patterns including seasonality and public holidays.
-- **Integrated Calendar Intelligence:** Modelled Turkish public holidays and religious observances (Eid al-Fitr, Eid al-Adha) and seasonal ROAS multipliers directly into the prediction and optimization layers.
-- **Implemented ROAS-Gated Recommendations:** Designed a budget recommendation engine that gates increase decisions against a configurable ROAS target, separating high-confidence scaling opportunities from risk-flagged ones.
-- **Implemented Automated Guardrails:** Designed an advanced confidence-scoring mechanism that safely automates budget recommendations while mitigating financial risk.
-- **Added LLM-Powered Explainability:** Integrated Anthropic Claude API to generate plain-language executive summaries per campaign and at portfolio level, bridging the gap between model outputs and business decision-makers.
-- **Standardized Budget Allocation:** Transformed the complex, manual task of marketing budget planning into a reproducible, production-ready Python application.
-- **Bridged Data to Business Strategy:** Successfully abstracted mathematical complexity and machine learning models into clear, prescriptive business actions with human-readable justifications.
+| Component | Detail |
+|---|---|
+| Data source | Google Ads API — ad group level, PURCHASE conversions |
+| ML models | scikit-learn Random Forest Regression (×2) |
+| Feature set | 30+ features including KPIs, lag metrics, holiday flags, season multipliers |
+| Optimization | Weighted scoring: Revenue 45%, Profit 35%, ROAS 20% |
+| LLM | Anthropic Claude API |
+| Language | Python — Pandas, NumPy, scikit-learn, anthropic, google-ads |
 
 ---
 
@@ -124,26 +104,12 @@ The pipeline follows a strict, mathematical flow to arrive at its recommendation
 
 ## How to Run
 
-**1. Install dependencies:**
-
 ```bash
 pip install -r requirements.txt
-```
-
-**2. Configure environment variables:**
-
-```bash
 cp .env.example .env
-# Edit .env with your credentials and desired settings
-```
-
-**3. Execute the pipeline:**
-
-```bash
+# Edit .env with your credentials
 python src/ads_ml_budget_intelligence.py
 ```
-
-Output files will be written to the directory specified by `VICCO_OUTPUT_DIR` (default: `./output`).
 
 ---
 
