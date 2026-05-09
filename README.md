@@ -66,47 +66,6 @@ Over the period the pipeline was in use, Vicco's ad-attributed revenue continued
 
 ---
 
-## Output Files
-
-| File | Description |
-|---|---|
-| `ads_budget_scenarios.csv` | All simulated budget scenarios per campaign |
-| `ads_budget_optimization_recommendations.csv` | Per-campaign optimization recommendations |
-| `ads_portfolio_budget_allocation.csv` | Portfolio-normalized budget allocation |
-| `ads_recommendation_summary.csv` | Final summary with LLM commentary column |
-| `ads_model_validation_metrics.csv` | MAE, RMSE, R2 for both models |
-| `ads_feature_importance.csv` | Feature importances for both models |
-| `ads_category_summary.csv` | KPI aggregation by product category and season |
-| `ads_product_summary.csv` | KPI aggregation by product group and campaign |
-| `ads_holiday_impact.csv` | Holiday vs pre-holiday vs normal day comparison |
-| `ads_daily_fact.csv` | Daily KPIs with calendar context per campaign |
-| `ads_weekly_campaign_summary.csv` | Weekly KPIs per campaign and category |
-| `ads_monthly_campaign_summary.csv` | Monthly KPIs per campaign and category |
-| `ads_portfolio_executive_commentary.txt` | LLM-generated portfolio summary (plain text) |
-| `ads_rule_based_fallback_recommendations.csv` | Rule-based output when ML data is insufficient |
-
----
-
-## Environment Variables
-
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `GOOGLE_ADS_DEVELOPER_TOKEN` | Yes | — | Google Ads API developer token |
-| `GOOGLE_ADS_CLIENT_ID` | Yes | — | OAuth2 client ID |
-| `GOOGLE_ADS_CLIENT_SECRET` | Yes | — | OAuth2 client secret |
-| `GOOGLE_ADS_REFRESH_TOKEN` | Yes | — | OAuth2 refresh token |
-| `GOOGLE_ADS_LOGIN_CUSTOMER_ID` | Yes | — | MCC / manager account ID |
-| `GOOGLE_ADS_CUSTOMER_ID` | Yes | — | Target customer account ID |
-| `DATE_MODE` | — | `last_60_days` | yesterday, last_30_days, last_60_days, or custom |
-| `DATE_FROM` | custom only | — | Start date YYYY-MM-DD |
-| `DATE_TO` | custom only | — | End date YYYY-MM-DD |
-| `VICCO_OUTPUT_DIR` | — | `./output` | Output directory path |
-| `TARGET_ROAS` | — | `3.0` | ROAS target threshold for compliance checks |
-| `ANTHROPIC_API_KEY` | — | — | Anthropic API key for LLM commentary |
-| `LLM_MAX_CAMPAIGNS` | — | `20` | Max campaigns to generate LLM commentary for |
-
----
-
 ## How to Run
 
 ```bash
