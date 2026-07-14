@@ -1,4 +1,4 @@
-## 🔴 Live Interactive Dashboard
+## 📊 Live Interactive Dashboard
 | | Link |
 |--|--|
 | Ads 2023/2024 · 2024/2025 · 2026 YTD | [View Dashboard →](https://ozlemtonbul.github.io/dashboards/ads_dashboard.html) |
@@ -13,9 +13,8 @@
 ![Machine Learning](https://img.shields.io/badge/ML-Random_Forest-orange)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-blue)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)
-![Pytest](https://img.shields.io/badge/Tests-151_Passing-success)
-![GitHub Actions](https://img.shields.io/badge/CI-GitHub_Actions-success)
-
+![Pytest](https://img.shields.io/badge/Tested_with-Pytest-success)
+![Tests](https://github.com/ozlemtonbul/ads-ml-budget-intelligence/actions/workflows/tests.yml/badge.svg)
 ---
 
 # Overview
@@ -538,6 +537,23 @@ This enables enterprise reporting through:
 - Dashboards
 - Business Intelligence tools
   ---
+# Performance Characteristics
+
+The platform is designed to support enterprise-scale campaign analysis.
+
+Capabilities include:
+
+- Modular architecture
+- Automated ETL
+- Feature Engineering
+- Predictive Analytics
+- Scenario Simulation
+- Rule-based Decision Engine
+- AI Commentary
+- PostgreSQL Reporting
+- Power BI Integration
+- Docker Deployment
+- GitHub Actions CI
 
 # Installation
 
@@ -637,6 +653,8 @@ Docker provisions:
 - Python Application
 - PostgreSQL Database
 - Shared Volumes
+- GitHub Actions CI
+- Environment Variables
 
 This allows the complete analytics platform to run in an isolated environment.
 
@@ -779,8 +797,9 @@ No company credentials or confidential datasets are included in this repository.
 
 # Current Status
 
-**Project Status:** Production-Ready Portfolio Project
+Project Status
 
+Production-ready modular analytics platform with automated testing, Docker support, PostgreSQL integration and CI/CD workflow.
 The current version provides:
 
 - Enterprise-ready architecture
