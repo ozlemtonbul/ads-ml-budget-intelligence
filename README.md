@@ -856,11 +856,5 @@ https://www.linkedin.com/in/ozlemtonbul/
 
 ---
 
-# License
 
-This repository is provided for portfolio and educational purposes.
-
-Company credentials, proprietary datasets, API keys and confidential business information are intentionally excluded from version control.
-
-© 2026 Özlem Tonbul. All rights reserved.
   
