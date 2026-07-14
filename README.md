@@ -535,8 +535,10 @@ This enables enterprise reporting through:
 - Power BI
 - SQL
 - Dashboards
-- Business Intelligence tools
-  ---
+Business Intelligence tools
+
+---
+
 # Performance Characteristics
 
 The platform is designed to support enterprise-scale campaign analysis.
@@ -554,6 +556,8 @@ Capabilities include:
 - Power BI Integration
 - Docker Deployment
 - GitHub Actions CI
+
+---
 
 # Installation
 
@@ -796,7 +800,7 @@ No company credentials or confidential datasets are included in this repository.
 
 # Current Status
 
-Project Status
+## Project Status
 
 Production-ready modular analytics platform with automated testing, Docker support, PostgreSQL integration and CI/CD workflow.
 The current version provides:
@@ -864,11 +868,15 @@ Specializations:
 - E-commerce Analytics
 - Operational Analytics
 
-🌐 Website: https://ozlemtonbul.com/
-
+ Website: [ozlemtonbul.com](https://ozlemtonbul.com/)
+ 
 GitHub: [ozlemtonbul](https://github.com/ozlemtonbul)
 
-LinkedIn: [Özlem Tonbul](https://www.linkedin.com/in/ozlemtonbul/)
+LinkedIn:[Özlem Tonbul](https://www.linkedin.com/in/ozlemtonbul/)
+
+---
+
+
 # License
 
 This repository is provided for portfolio and educational purposes.
