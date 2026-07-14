@@ -1,3 +1,8 @@
+## 📊 Live Interactive Dashboard
+| | Link |
+|--|--|
+| Ads 2023/2024 · 2024/2025 · 2026 YTD | [View Dashboard →](https://ozlemtonbul.github.io/dashboards/ads_dashboard.html) |
+
 # Ads Budget Intelligence
 
 > **Enterprise AI-Powered Marketing Decision Intelligence Platform**
