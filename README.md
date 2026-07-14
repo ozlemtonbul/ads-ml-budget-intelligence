@@ -653,8 +653,7 @@ Docker provisions:
 - Python Application
 - PostgreSQL Database
 - Shared Volumes
-- GitHub Actions CI
-- Environment Variables
+- Isolated Runtime Environment
 
 This allows the complete analytics platform to run in an isolated environment.
 
@@ -865,13 +864,9 @@ Specializations:
 - E-commerce Analytics
 - Operational Analytics
 
-GitHub:
+GitHub: [ozlemtonbul](https://github.com/ozlemtonbul)
 
-https://github.com/ozlemtonbul
-
-LinkedIn:
-
-https://www.linkedin.com/in/ozlemtonbul/
+LinkedIn: [Özlem Tonbul](https://www.linkedin.com/in/ozlemtonbul/)
 
 ---
 
