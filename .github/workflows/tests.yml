@@ -1,0 +1,72 @@
+name: Automated Tests
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Python 3.13 Test Suite
+    runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_ADS_DEVELOPER_TOKEN: test-developer-token
+      GOOGLE_ADS_CLIENT_ID: test-client-id
+      GOOGLE_ADS_CLIENT_SECRET: test-client-secret
+      GOOGLE_ADS_REFRESH_TOKEN: test-refresh-token
+      GOOGLE_ADS_LOGIN_CUSTOMER_ID: "1234567890"
+      GOOGLE_ADS_CUSTOMER_ID: "9876543210"
+
+      GA4_PROPERTY_ID: "123456789"
+      GA4_SERVICE_ACCOUNT_FILE: credentials/test-ga4-service-account.json
+
+      ANTHROPIC_API_KEY: ""
+
+      DATE_MODE: custom
+      DATE_FROM: "2026-01-01"
+      DATE_TO: "2026-01-31"
+
+      TARGET_ROAS: "3.0"
+      LLM_LANG: en
+      LLM_MAX_CAMPAIGNS: "20"
+
+      VICCO_OUTPUT_DIR: ./outputs
+
+      POSTGRES_ENABLED: "false"
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ads_budget
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_IF_EXISTS: replace
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Create required folders
+        run: |
+          mkdir -p credentials
+          mkdir -p outputs/logs
+
+      - name: Run automated tests
+        run: python -m pytest -v
