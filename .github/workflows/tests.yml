@@ -11,12 +11,24 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Python 3.13 Test Suite
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     env:
+      # ======================================================
+      # Google Ads test configuration
+      # ======================================================
+
       GOOGLE_ADS_DEVELOPER_TOKEN: test-developer-token
       GOOGLE_ADS_CLIENT_ID: test-client-id
       GOOGLE_ADS_CLIENT_SECRET: test-client-secret
@@ -24,27 +36,59 @@ jobs:
       GOOGLE_ADS_LOGIN_CUSTOMER_ID: "1234567890"
       GOOGLE_ADS_CUSTOMER_ID: "9876543210"
 
+      # ======================================================
+      # Google Analytics 4 test configuration
+      # ======================================================
+
       GA4_PROPERTY_ID: "123456789"
       GA4_SERVICE_ACCOUNT_FILE: credentials/test-ga4-service-account.json
 
-      ANTHROPIC_API_KEY: ""
+      # ======================================================
+      # Date range
+      # ======================================================
 
       DATE_MODE: custom
       DATE_FROM: "2026-01-01"
       DATE_TO: "2026-01-31"
 
-      TARGET_ROAS: "3.0"
-      LLM_LANG: en
-      LLM_MAX_CAMPAIGNS: "20"
+      # ======================================================
+      # Business target
+      # ======================================================
 
-      VICCO_OUTPUT_DIR: ./outputs
+      TARGET_ROAS: "3.0"
+
+      # ======================================================
+      # Multi-LLM test configuration
+      # ======================================================
+
+      LLM_ENABLED: "false"
+      LLM_PROVIDER: anthropic
+      LLM_MODEL: claude-sonnet-4-6
+      LLM_LANGUAGE: en
+      LLM_MAX_CAMPAIGNS: "20"
+      LLM_MAX_TOKENS: "1200"
+      LLM_TEMPERATURE: "0.2"
+
+      ANTHROPIC_API_KEY: ""
+      OPENAI_API_KEY: ""
+      GEMINI_API_KEY: ""
+
+      # ======================================================
+      # Output
+      # ======================================================
+
+      OUTPUT_DIR: ./outputs
+
+      # ======================================================
+      # PostgreSQL
+      # ======================================================
 
       POSTGRES_ENABLED: "false"
       POSTGRES_HOST: localhost
       POSTGRES_PORT: "5432"
       POSTGRES_DB: ads_budget
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: test-password
       POSTGRES_IF_EXISTS: replace
 
     steps:
@@ -56,17 +100,29 @@ jobs:
         with:
           python-version: "3.13"
           cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
 
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      - name: Install dependencies
-        run: python -m pip install -r requirements.txt
+      - name: Install development dependencies
+        run: python -m pip install -r requirements-dev.txt
 
-      - name: Create required folders
+      - name: Create required directories and test credentials
+        shell: bash
         run: |
           mkdir -p credentials
-          mkdir -p outputs/logs
+          mkdir -p outputs
+          mkdir -p logs
+          printf '{}\n' > credentials/test-ga4-service-account.json
+
+      - name: Validate application imports
+        run: |
+          python -c "import config.settings"
+          python -c "import src.recommendations.recommendation_engine"
+          python -c "import src.llm.manager"
 
       - name: Run automated tests
-        run: python -m pytest -v
+        run: python -m pytest tests -v --tb=short

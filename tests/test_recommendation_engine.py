@@ -246,7 +246,11 @@ def test_generate_llm_commentary_without_api_key():
 
     with patch.dict(
         os.environ,
-        {"ANTHROPIC_API_KEY": ""},
+        {
+            "LLM_ENABLED": "true",
+            "LLM_PROVIDER": "anthropic",
+            "ANTHROPIC_API_KEY": "",
+        },
         clear=False,
     ):
         result = generate_llm_commentary(
@@ -257,25 +261,23 @@ def test_generate_llm_commentary_without_api_key():
     assert "ExecutiveCommentary" in result.columns
     assert (
         result.loc[0, "ExecutiveCommentary"]
-        == "LLM commentary skipped because API key is missing."
+        == (
+            "AI commentary is unavailable. "
+            "Use the rule-based recommendation and confidence level "
+            "for decision-making."
+        )
     )
 
 
 @patch(
-    "src.recommendations.recommendation_engine.anthropic.Anthropic"
+    "src.recommendations.recommendation_engine.generate_text"
 )
 def test_generate_llm_commentary_with_mock(
-    mock_anthropic,
+    mock_generate_text,
 ):
-    mock_client = MagicMock()
-    mock_anthropic.return_value = mock_client
-
-    mock_message = MagicMock()
-    mock_content = MagicMock()
-    mock_content.text = "Increase budget cautiously."
-    mock_message.content = [mock_content]
-
-    mock_client.messages.create.return_value = mock_message
+    mock_generate_text.return_value = (
+        "Increase budget cautiously."
+    )
 
     df = pd.DataFrame(
         {
@@ -297,28 +299,26 @@ def test_generate_llm_commentary_with_mock(
         }
     )
 
-    with patch.dict(
-        os.environ,
-        {"ANTHROPIC_API_KEY": "test-key"},
-        clear=False,
-    ):
-        result = generate_llm_commentary(
-            df,
-            target_roas=3.0,
-        )
+    result = generate_llm_commentary(
+        df,
+        target_roas=3.0,
+    )
 
     assert (
         result.loc[0, "ExecutiveCommentary"]
         == "Increase budget cautiously."
     )
 
-    mock_client.messages.create.assert_called_once()
+    mock_generate_text.assert_called_once()
 
 
 def test_generate_portfolio_summary_without_api_key():
     portfolio_df = pd.DataFrame(
         {
             "CurrentSpend": [100.0],
+            "OptimizedPortfolioBudget": [0.0],
+            "RecommendedAction": ["Maintain"],
+            "PredictedRevenue": [0.0],
         }
     )
 
@@ -331,7 +331,11 @@ def test_generate_portfolio_summary_without_api_key():
 
     with patch.dict(
         os.environ,
-        {"ANTHROPIC_API_KEY": ""},
+        {
+            "LLM_ENABLED": "true",
+            "LLM_PROVIDER": "anthropic",
+            "ANTHROPIC_API_KEY": "",
+        },
         clear=False,
     ):
         result = generate_portfolio_summary_commentary(
@@ -340,4 +344,7 @@ def test_generate_portfolio_summary_without_api_key():
             target_roas=3.0,
         )
 
-    assert "API key is missing" in result
+    assert isinstance(result, str)
+    assert "Portfolio contains 1 campaigns" in result
+    assert "ROAS target of 3.0" in result
+    assert "top category is Shoes" in result

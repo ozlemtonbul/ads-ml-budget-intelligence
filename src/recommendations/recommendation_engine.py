@@ -1,6 +1,3 @@
-import os
-
-import anthropic
 import numpy as np
 import pandas as pd
 
@@ -8,6 +5,7 @@ from src.features.feature_engineering import (
     compute_kpis,
     compute_roas_target_gap,
 )
+from src.llm.manager import generate_text
 from src.models.budget_optimizer import add_campaign_type
 from src.utils.logger import get_logger
 
@@ -552,32 +550,10 @@ def generate_llm_commentary(
     if summary_df.empty:
         return summary_df.copy()
 
-    api_key = os.getenv(
-        "ANTHROPIC_API_KEY",
-        "",
-    ).strip()
-
-    if not api_key:
-        logger.warning(
-            "ANTHROPIC_API_KEY is missing. "
-            "LLM commentary will be skipped."
-        )
-
-        result_df = summary_df.copy()
-
-        result_df["ExecutiveCommentary"] = (
-            "LLM commentary skipped because API key is missing."
-        )
-
-        return result_df
-
-    client = anthropic.Anthropic(
-        api_key=api_key
-    )
-
+    result_df = summary_df.copy()
     commentaries = []
 
-    rows_to_process = summary_df.head(
+    rows_to_process = result_df.head(
         max_campaigns
     )
 
@@ -587,39 +563,29 @@ def generate_llm_commentary(
             target_roas,
         )
 
-        try:
-            message = client.messages.create(
-                model="claude-sonnet-4-6",
-                max_tokens=300,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
+        commentary = generate_text(
+            prompt=prompt,
+            max_tokens=300,
+            temperature=0.2,
+        )
+
+        if commentary is None:
+            logger.warning(
+                "LLM commentary unavailable for campaign %s. "
+                "Using safe fallback commentary.",
+                row.get("Campaign", ""),
             )
 
             commentary = (
-                message.content[0].text.strip()
-                if message.content
-                else "Executive commentary could not be generated."
+                "AI commentary is unavailable. "
+                "Use the rule-based recommendation and confidence "
+                "level for decision-making."
             )
 
-            commentaries.append(commentary)
-
-        except Exception as exc:
-            logger.warning(
-                "LLM error for campaign %s: %s",
-                row.get("Campaign", ""),
-                exc,
-            )
-
-            commentaries.append(
-                "Executive commentary could not be generated."
-            )
+        commentaries.append(commentary)
 
     remaining_count = (
-        len(summary_df)
+        len(result_df)
         - len(rows_to_process)
     )
 
@@ -628,11 +594,7 @@ def generate_llm_commentary(
         * remaining_count
     )
 
-    result_df = summary_df.copy()
-
-    result_df["ExecutiveCommentary"] = (
-        commentaries
-    )
+    result_df["ExecutiveCommentary"] = commentaries
 
     return result_df
 
@@ -642,26 +604,11 @@ def generate_portfolio_summary_commentary(
     category_df: pd.DataFrame,
     target_roas: float,
 ) -> str:
-    api_key = os.getenv(
-        "ANTHROPIC_API_KEY",
-        "",
-    ).strip()
-
-    if not api_key:
-        return (
-            "LLM portfolio commentary skipped because "
-            "API key is missing."
-        )
-
     if portfolio_df.empty:
         return (
             "Portfolio commentary skipped because "
             "portfolio data is empty."
         )
-
-    client = anthropic.Anthropic(
-        api_key=api_key
-    )
 
     total_spend = float(
         portfolio_df.get(
@@ -751,31 +698,30 @@ Top category ROAS: {top_category_roas:.2f}
 Portfolio executive summary:
 """.strip()
 
-    try:
-        message = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=500,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-        )
+    commentary = generate_text(
+        prompt=prompt,
+        max_tokens=500,
+        temperature=0.2,
+    )
 
-        if not message.content:
-            return (
-                "Portfolio commentary could not be generated."
-            )
-
-        return message.content[0].text.strip()
-
-    except Exception as exc:
+    if commentary is None:
         logger.warning(
-            "Portfolio LLM error: %s",
-            exc,
+            "Portfolio LLM commentary is unavailable. "
+            "Using safe fallback summary."
         )
 
         return (
-            "Portfolio commentary could not be generated."
+            f"Portfolio contains {campaign_count} campaigns with "
+            f"a current daily spend of {total_spend:.2f} and an "
+            f"optimized budget of {total_recommended:.2f}. "
+            f"{increase_count} campaigns are recommended for an "
+            f"increase and {reduce_count} for a reduction. "
+            f"Predicted total revenue is "
+            f"{total_predicted_revenue:.2f}, against a ROAS target "
+            f"of {target_roas:.1f}. "
+            f"The top category is {top_category} with a ROAS of "
+            f"{top_category_roas:.2f}."
         )
+
+    return commentary
+

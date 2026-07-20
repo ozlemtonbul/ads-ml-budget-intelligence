@@ -36,7 +36,12 @@ Unlike traditional reporting solutions, the platform predicts future campaign pe
 - Random Forest prediction models
 - Budget optimization engine
 - Portfolio allocation engine
+- Provider-independent Multi-LLM architecture
+- Anthropic Claude support
+- OpenAI GPT support
+- Google Gemini support
 - AI-generated executive commentary
+- Rule-based AI fallback
 - PostgreSQL integration
 - Docker support
 - GitHub Actions CI
@@ -102,27 +107,38 @@ Key business outcomes include:
       └────────────────────┼────────────────────┘
                            ▼
                  Training Dataset Builder
+                           │
                            ▼
                 Random Forest ML Models
           ┌────────────────┴────────────────┐
           ▼                                 ▼
-Revenue Prediction               Conversion Prediction
+ Revenue Prediction               Conversion Prediction
           └────────────────┬────────────────┘
+                           │
                            ▼
              Budget Scenario Simulation
+                           │
                            ▼
               Budget Optimization Engine
+                           │
                            ▼
                Recommendation Engine
-      ┌──────────────┼──────────────┬──────────────┐
-      ▼              ▼              ▼
-CSV Reports     PostgreSQL      AI Commentary
-                                      │
-                                      ▼
-                               Power BI Dashboard
+                           │
+                           ▼
+                     LLM Manager
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+   Anthropic Claude    OpenAI GPT    Google Gemini
+          └────────────────┼────────────────┘
+                           │
+                           ▼
+               Executive Commentary
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+     CSV Reports      PostgreSQL      Power BI
 ```
-
----
 
 # Enterprise Architecture
 
@@ -137,12 +153,21 @@ config/
 src/
 │
 ├── extract/
-│      Google Ads
-│      GA4
+│      Google Ads Extraction
+│      Google Analytics 4 Extraction
 │
 ├── features/
 │      Feature Engineering
 │      Reporting
+│
+├── llm/
+│      LLM Manager
+│      Base Provider Interface
+│
+│      providers/
+│      ├── Anthropic Claude Provider
+│      ├── OpenAI GPT Provider
+│      └── Google Gemini Provider
 │
 ├── models/
 │      Machine Learning
@@ -156,7 +181,6 @@ src/
 │
 └── utils/
        Logger
-```
 
 ---
 
@@ -170,7 +194,7 @@ src/
 | ML Algorithm | Random Forest Regression |
 | APIs | Google Ads API |
 | Analytics | Google Analytics Data API |
-| AI | Anthropic Claude API |
+| AI | Multi-LLM (Anthropic Claude • OpenAI GPT • Google Gemini) |
 | Database | PostgreSQL |
 | Containerization | Docker |
 | Reporting | Power BI |
@@ -212,6 +236,14 @@ ads-budget-intelligence/
 ├── src/
 │   ├── extract/
 │   ├── features/
+│   ├── llm/
+│   │   ├── providers/
+│   │   │   ├── anthropic_provider.py
+│   │   │   ├── openai_provider.py
+│   │   │   └── gemini_provider.py
+│   │   ├── manager.py
+│   │   ├── base.py
+│   │   └── __init__.py
 │   ├── models/
 │   ├── recommendations/
 │   ├── warehouse/
@@ -228,7 +260,6 @@ ads-budget-intelligence/
 ├── README.md
 └── requirements.txt
 ```
-
 ---
 
 # Data Flow
@@ -257,13 +288,19 @@ Budget Optimization
         ▼
 Recommendation Engine
         │
+        ▼
+LLM Manager
+        │
  ┌──────┼───────────────┐
  ▼      ▼               ▼
-CSV   PostgreSQL   Executive Commentary
- │      │               │
- └──────┴───────────────┘
-           ▼
-     Power BI Dashboard
+Anthropic Claude   OpenAI GPT   Google Gemini
+        │
+        ▼
+Executive Commentary
+        │
+ ┌──────┼───────────────┐
+ ▼      ▼               ▼
+CSV Reports   PostgreSQL   Power BI Dashboard
 ```
 
 ---
@@ -474,17 +511,30 @@ This allows budget allocation decisions to be made at portfolio level instead of
 
 ## Executive Commentary
 
-The platform integrates Anthropic Claude to automatically generate business-friendly summaries.
+The platform supports provider-independent AI-generated executive commentary through a centralized Multi-LLM Manager.
+
+Supported Large Language Model (LLM) providers include:
+
+- Anthropic Claude
+- OpenAI GPT
+- Google Gemini
+
+The Recommendation Engine generates structured business prompts, while the LLM Manager routes requests to the selected provider based on the environment configuration.
 
 Generated commentary includes:
 
-- Campaign summary
-- Portfolio summary
-- Budget recommendations
-- Executive insights
+- Campaign Summary
+- Portfolio Summary
+- Budget Recommendations
+- Executive Insights
+- Business Risk Assessment
+- Optimization Opportunities
 
-The objective is to translate technical model outputs into language understandable by marketing managers and executives.
+Only one LLM provider is active at runtime. The active provider is selected using the project configuration.
 
+If no API key is configured or the selected provider is unavailable, the platform automatically falls back to deterministic rule-based executive commentary, ensuring uninterrupted recommendation generation.
+
+The objective is to translate machine learning predictions and optimization results into clear, business-friendly insights for marketing managers, analysts, and executive stakeholders.
 ---
 
 # Output Files
@@ -551,7 +601,8 @@ Capabilities include:
 - Predictive Analytics
 - Scenario Simulation
 - Rule-based Decision Engine
-- AI Commentary
+- Provider-independent Multi-LLM Architecture
+- AI-generated Executive Commentary
 - PostgreSQL Reporting
 - Power BI Integration
 - Docker Deployment
@@ -605,13 +656,24 @@ cp .env.example .env
 
 Configure the following services:
 
-- Google Ads API
-- Google Analytics 4
-- Anthropic API
-- PostgreSQL
+- Google Ads API credentials
+- Google Analytics 4 credentials
+- LLM Provider (Anthropic Claude, OpenAI GPT, or Google Gemini)
+- PostgreSQL connection
 - Target ROAS
 - Date Range
 
+## Multi-LLM Configuration
+
+```env
+LLM_PROVIDER=anthropic
+LLM_MODEL=claude-sonnet-4-6
+
+ANTHROPIC_API_KEY=
+
+OPENAI_API_KEY=
+
+GEMINI_API_KEY=
 ---
 
 # Running the Project
@@ -723,6 +785,8 @@ Coverage includes:
 - Configuration
 - Main Pipeline
 
+## Current Status
+
 Current status:
 
 - ✅ 151 Automated Tests Passing
@@ -730,6 +794,12 @@ Current status:
 - ✅ Modular Unit Tests
 - ✅ Integration Tests
 - ✅ Mock API Testing
+- ✅ Provider-independent Multi-LLM Architecture
+- ✅ LLM Manager
+- ✅ Anthropic Claude Provider
+- ✅ OpenAI GPT Provider
+- ✅ Google Gemini Provider
+- ✅ Rule-based Fallback
 
 Run all tests:
 
@@ -778,13 +848,19 @@ No company credentials or confidential datasets are included in this repository.
 - ✅ Machine Learning Models
 - ✅ Budget Optimization Engine
 - ✅ Recommendation Engine
+- ✅ Multi-LLM Architecture
+- ✅ LLM Manager
+- ✅ Anthropic Provider
+- ✅ OpenAI Provider
+- ✅ Google Gemini Provider
+- ✅ Rule-based Fallback
+- ✅ AI-Generated Executive Commentary
 - ✅ CSV Export
 - ✅ PostgreSQL Export
 - ✅ Docker Support
 - ✅ Docker Compose
 - ✅ GitHub Actions CI
 - ✅ Automated Testing (151 Tests)
-- ✅ Executive Commentary
 
 ## Planned
 
@@ -803,6 +879,7 @@ No company credentials or confidential datasets are included in this repository.
 ## Project Status
 
 Production-ready modular analytics platform with automated testing, Docker support, PostgreSQL integration and CI/CD workflow.
+
 The current version provides:
 
 - Enterprise-ready architecture
@@ -810,7 +887,8 @@ The current version provides:
 - Automated ETL pipeline
 - Machine Learning forecasting
 - Budget optimization
-- AI-generated recommendations
+- Provider-independent Multi-LLM architecture
+- AI-generated executive commentary
 - Docker support
 - PostgreSQL integration
 - GitHub Actions CI
@@ -826,13 +904,14 @@ The current version provides:
 | Google Ads API | ✅ |
 | Google Analytics 4 | ✅ |
 | Machine Learning | ✅ |
+| Multi-LLM Support | ✅ |
+| Provider-Independent Architecture | ✅ |
 | Docker | ✅ |
 | PostgreSQL | ✅ |
 | GitHub Actions | ✅ |
 | Automated Tests | ✅ 151 Passing |
 | Power BI Ready | ✅ |
 | Enterprise Architecture | ✅ |
-
 ---
 
 # Future Enhancements

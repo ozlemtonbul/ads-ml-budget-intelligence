@@ -134,22 +134,6 @@ def ga4_ready() -> bool:
 
 
 # ============================================================
-# Anthropic
-# ============================================================
-
-ANTHROPIC_API_KEY = os.getenv(
-    "ANTHROPIC_API_KEY"
-)
-
-
-def anthropic_ready() -> bool:
-    return (
-        ANTHROPIC_API_KEY is not None
-        and ANTHROPIC_API_KEY.strip() != ""
-    )
-
-
-# ============================================================
 # Date range
 # ============================================================
 
@@ -178,18 +162,137 @@ TARGET_ROAS = _get_float(
 
 
 # ============================================================
-# LLM
+# Large Language Model
 # ============================================================
 
-LLM_LANG = os.getenv(
-    "LLM_LANG",
-    "en",
+SUPPORTED_LLM_PROVIDERS = {
+    "anthropic",
+    "openai",
+    "gemini",
+}
+
+LLM_ENABLED = _get_bool(
+    "LLM_ENABLED",
+    True,
+)
+
+LLM_PROVIDER = os.getenv(
+    "LLM_PROVIDER",
+    "anthropic",
+).strip().lower()
+
+if LLM_PROVIDER not in SUPPORTED_LLM_PROVIDERS:
+    raise ValueError(
+        "LLM_PROVIDER must be one of: "
+        f"{', '.join(sorted(SUPPORTED_LLM_PROVIDERS))}. "
+        f"Received: {LLM_PROVIDER}"
+    )
+
+LLM_MODEL = os.getenv(
+    "LLM_MODEL",
+    "",
+).strip()
+
+LLM_LANGUAGE = os.getenv(
+    "LLM_LANGUAGE",
+    os.getenv(
+        "LLM_LANG",
+        "en",
+    ),
 ).strip()
 
 LLM_MAX_CAMPAIGNS = _get_int(
     "LLM_MAX_CAMPAIGNS",
     20,
 )
+
+LLM_MAX_TOKENS = _get_int(
+    "LLM_MAX_TOKENS",
+    1200,
+)
+
+LLM_TEMPERATURE = _get_float(
+    "LLM_TEMPERATURE",
+    0.2,
+)
+
+
+# ============================================================
+# LLM API keys
+# ============================================================
+
+ANTHROPIC_API_KEY = os.getenv(
+    "ANTHROPIC_API_KEY"
+)
+
+OPENAI_API_KEY = os.getenv(
+    "OPENAI_API_KEY"
+)
+
+GEMINI_API_KEY = os.getenv(
+    "GEMINI_API_KEY"
+)
+
+
+def _has_value(value: str | None) -> bool:
+    return (
+        value is not None
+        and value.strip() != ""
+    )
+
+
+def anthropic_ready() -> bool:
+    return _has_value(
+        ANTHROPIC_API_KEY
+    )
+
+
+def openai_ready() -> bool:
+    return _has_value(
+        OPENAI_API_KEY
+    )
+
+
+def gemini_ready() -> bool:
+    return _has_value(
+        GEMINI_API_KEY
+    )
+
+
+def selected_llm_api_key() -> str | None:
+    provider_keys = {
+        "anthropic": ANTHROPIC_API_KEY,
+        "openai": OPENAI_API_KEY,
+        "gemini": GEMINI_API_KEY,
+    }
+
+    return provider_keys.get(
+        LLM_PROVIDER
+    )
+
+
+def llm_ready() -> bool:
+    if not LLM_ENABLED:
+        return False
+
+    if LLM_MODEL == "":
+        return False
+
+    return _has_value(
+        selected_llm_api_key()
+    )
+
+
+def llm_status() -> dict[str, str | bool]:
+    return {
+        "enabled": LLM_ENABLED,
+        "provider": LLM_PROVIDER,
+        "model": LLM_MODEL,
+        "api_key_configured": _has_value(
+            selected_llm_api_key()
+        ),
+        "ready": llm_ready(),
+    }
 
 
 # ============================================================

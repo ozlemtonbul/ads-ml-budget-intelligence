@@ -1,35 +1,64 @@
+# ============================================================
+# Base Image
+# ============================================================
+
 FROM python:3.13-slim
 
-# Python settings
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
+# ============================================================
+# Environment Variables
+# ============================================================
 
-# Working directory
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+# ============================================================
+# Working Directory
+# ============================================================
+
 WORKDIR /app
 
-# System dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        gcc \
-        libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+# ============================================================
+# System Dependencies
+# ============================================================
 
-# Install Python packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc \
+        libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# ============================================================
+# Install Python Dependencies
+# ============================================================
+
 COPY requirements.txt .
 
-RUN python -m pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+RUN python -m pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Copy project
+# ============================================================
+# Copy Project Files
+# ============================================================
+
 COPY config ./config
 COPY src ./src
+COPY docs ./docs
+COPY tests ./tests
 COPY main.py .
 COPY README.md .
 COPY .env.example .
 
-# Create required folders
-RUN mkdir -p /app/outputs \
-    && mkdir -p /app/logs
+# ============================================================
+# Create Runtime Directories
+# ============================================================
 
-# Default command
+RUN mkdir -p \
+    /app/outputs \
+    /app/logs
+
+# ============================================================
+# Default Command
+# ============================================================
+
 CMD ["python", "main.py"]
