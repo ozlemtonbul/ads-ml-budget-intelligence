@@ -4,6 +4,7 @@ from src.models.budget_optimizer import (
     add_campaign_type,
     classify_campaign_type,
     choose_optimal_scenario,
+    simulate_budget_scenarios,
 )
 
 
@@ -52,3 +53,36 @@ def test_choose_optimal_scenario():
     assert len(result) == 2
     assert set(result["CampaignId"]) == {1, 2}
     assert "OptimizationScore" in result.columns
+
+
+def test_zero_spend_scenario_has_zero_predictions():
+    class PositiveModel:
+        def predict(self, dataframe):
+            return [100.0]
+
+    latest = pd.DataFrame(
+        {
+            "CampaignId": [1],
+            "Campaign": ["Inactive Campaign"],
+            "CampaignType": ["Generic"],
+            "Spend": [0.0],
+            "Clicks": [0.0],
+            "Conversions": [0.0],
+            "ConversionValue": [0.0],
+            "ExpectedROASMultiplier": [1.15],
+        }
+    )
+
+    result = simulate_budget_scenarios(
+        latest_df=latest,
+        model_conv=PositiveModel(),
+        model_rev=PositiveModel(),
+        feature_cols=["Spend"],
+    )
+
+    assert not result.empty
+    assert (result["ScenarioSpend"] == 0.0).all()
+    assert (result["PredictedConversions"] == 0.0).all()
+    assert (result["PredictedRevenue"] == 0.0).all()
+    assert (result["PredictedProfit"] == 0.0).all()
+    assert (result["PredictedROAS"] == 0.0).all()

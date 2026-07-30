@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Install this file only when an LLM provider will be enabled.
+# The application imports only the provider selected in .env.
+openai>=2,<3
+anthropic>=0.60,<1
+google-genai>=1.30,<2

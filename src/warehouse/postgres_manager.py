@@ -1,7 +1,11 @@
 from typing import Dict
 
 import pandas as pd
-from sqlalchemy import create_engine
+
+try:
+    from sqlalchemy import create_engine
+except ImportError:
+    create_engine = None
 
 from config.settings import (
     POSTGRES_DB,
@@ -25,6 +29,13 @@ def get_postgres_engine():
     if not POSTGRES_ENABLED:
         logger.info("PostgreSQL export is disabled.")
         return None
+
+    if create_engine is None:
+        raise RuntimeError(
+            "PostgreSQL export is enabled, but SQLAlchemy is not "
+            "installed. Install 'sqlalchemy' and "
+            "'psycopg2-binary', or set POSTGRES_ENABLED=false."
+        )
 
     required = {
         "POSTGRES_USER": POSTGRES_USER,

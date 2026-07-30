@@ -4,6 +4,75 @@ import config.settings as settings
 
 
 # ============================================================
+# LLM provider resolution
+# ============================================================
+
+def test_resolve_llm_provider_detects_single_openai_key():
+    result = settings.resolve_llm_provider(
+        "auto",
+        {
+            "anthropic": "",
+            "openai": "openai-key",
+            "gemini": "",
+        },
+    )
+
+    assert result == "openai"
+
+
+def test_resolve_llm_provider_detects_single_anthropic_key():
+    result = settings.resolve_llm_provider(
+        "auto",
+        {
+            "anthropic": "anthropic-key",
+            "openai": "",
+            "gemini": "",
+        },
+    )
+
+    assert result == "anthropic"
+
+
+def test_resolve_llm_provider_detects_single_gemini_key():
+    result = settings.resolve_llm_provider(
+        "auto",
+        {
+            "anthropic": "",
+            "openai": "",
+            "gemini": "gemini-key",
+        },
+    )
+
+    assert result == "gemini"
+
+
+def test_resolve_llm_provider_rejects_ambiguous_auto_keys():
+    result = settings.resolve_llm_provider(
+        "auto",
+        {
+            "anthropic": "anthropic-key",
+            "openai": "openai-key",
+            "gemini": "",
+        },
+    )
+
+    assert result == "auto"
+
+
+def test_resolve_llm_provider_preserves_explicit_provider():
+    result = settings.resolve_llm_provider(
+        "gemini",
+        {
+            "anthropic": "anthropic-key",
+            "openai": "",
+            "gemini": "",
+        },
+    )
+
+    assert result == "gemini"
+
+
+# ============================================================
 # require_env
 # ============================================================
 

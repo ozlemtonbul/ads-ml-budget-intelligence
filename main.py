@@ -35,6 +35,9 @@ from src.models.budget_optimizer import (
     simulate_budget_scenarios,
     train_and_validate_models,
 )
+from src.recommendations.campaign_planner import (
+    build_new_campaign_proposals,
+)
 from src.recommendations.recommendation_engine import (
     add_budget_spike_flag,
     apply_confidence_guardrail,
@@ -60,12 +63,20 @@ def resolve_date_range() -> Tuple[str, str]:
     mode = DATE_MODE.lower().strip()
 
     if mode == "yesterday":
-        date_value = datetime.now().date() - timedelta(days=1)
-        formatted_date = date_value.strftime("%Y-%m-%d")
+        selected_date = (
+            datetime.now().date()
+            - timedelta(days=1)
+        )
+        formatted_date = selected_date.strftime(
+            "%Y-%m-%d"
+        )
         return formatted_date, formatted_date
 
     if mode == "last_30_days":
-        end_date = datetime.now().date() - timedelta(days=1)
+        end_date = (
+            datetime.now().date()
+            - timedelta(days=1)
+        )
         start_date = end_date - timedelta(days=29)
 
         return (
@@ -74,7 +85,10 @@ def resolve_date_range() -> Tuple[str, str]:
         )
 
     if mode == "last_60_days":
-        end_date = datetime.now().date() - timedelta(days=1)
+        end_date = (
+            datetime.now().date()
+            - timedelta(days=1)
+        )
         start_date = end_date - timedelta(days=59)
 
         return (
@@ -85,7 +99,8 @@ def resolve_date_range() -> Tuple[str, str]:
     if mode == "custom":
         if not DATE_FROM or not DATE_TO:
             raise ValueError(
-                "DATE_FROM and DATE_TO are required when DATE_MODE=custom."
+                "DATE_FROM and DATE_TO are required "
+                "when DATE_MODE=custom."
             )
 
         try:
@@ -101,7 +116,8 @@ def resolve_date_range() -> Tuple[str, str]:
 
         except ValueError as exc:
             raise ValueError(
-                "DATE_FROM and DATE_TO must use YYYY-MM-DD format."
+                "DATE_FROM and DATE_TO must use "
+                "YYYY-MM-DD format."
             ) from exc
 
         if start_date > end_date:
@@ -113,7 +129,8 @@ def resolve_date_range() -> Tuple[str, str]:
 
     raise ValueError(
         "DATE_MODE must be one of: "
-        "yesterday, last_30_days, last_60_days, custom"
+        "yesterday, last_30_days, "
+        "last_60_days, custom"
     )
 
 
@@ -129,21 +146,24 @@ def export_csv(
     for table_name, dataframe in outputs.items():
         if dataframe is None:
             logger.warning(
-                "CSV export skipped for '%s' because dataframe is None.",
+                "CSV export skipped for '%s' because "
+                "dataframe is None.",
                 table_name,
             )
             continue
 
         if not isinstance(dataframe, pd.DataFrame):
             logger.warning(
-                "CSV export skipped for '%s' because value is not a dataframe.",
+                "CSV export skipped for '%s' because "
+                "value is not a dataframe.",
                 table_name,
             )
             continue
 
         if dataframe.empty:
             logger.warning(
-                "CSV export skipped for '%s' because dataframe is empty.",
+                "CSV export skipped for '%s' because "
+                "dataframe is empty.",
                 table_name,
             )
             continue
@@ -166,6 +186,28 @@ def export_csv(
         )
 
 
+def add_analysis_period(
+    dataframe: pd.DataFrame,
+    date_from: str,
+    date_to: str,
+) -> pd.DataFrame:
+    """
+    Add the pipeline analysis period to an output.
+
+    Dashboard pages use these columns to determine
+    whether an output belongs to the selected period.
+    """
+    if dataframe is None:
+        return pd.DataFrame()
+
+    result = dataframe.copy()
+
+    result["AnalysisStartDate"] = date_from
+    result["AnalysisEndDate"] = date_to
+
+    return result
+
+
 def load_ga4_data(
     date_from: str,
     date_to: str,
@@ -180,7 +222,8 @@ def load_ga4_data(
 
         if ga4_raw.empty:
             logger.warning(
-                "GA4 returned no data for the selected date range."
+                "GA4 returned no data for the "
+                "selected date range."
             )
         else:
             logger.info(
@@ -195,7 +238,6 @@ def load_ga4_data(
             "GA4 could not be loaded: %s",
             exc,
         )
-
         return pd.DataFrame()
 
 
@@ -217,6 +259,10 @@ def main() -> None:
         TARGET_ROAS,
     )
 
+    # --------------------------------------------------------
+    # Holiday calendar
+    # --------------------------------------------------------
+
     holiday_map = build_holiday_map(
         date_from,
         date_to,
@@ -227,6 +273,10 @@ def main() -> None:
         len(holiday_map),
     )
 
+    # --------------------------------------------------------
+    # Google Ads and GA4 extraction
+    # --------------------------------------------------------
+
     ads_raw = fetch_ads_purchase_only(
         date_from,
         date_to,
@@ -234,7 +284,8 @@ def main() -> None:
 
     if ads_raw.empty:
         logger.warning(
-            "Google Ads API returned no data. Pipeline stopped."
+            "Google Ads API returned no data. "
+            "Pipeline stopped."
         )
         return
 
@@ -251,6 +302,10 @@ def main() -> None:
     ads_raw = add_campaign_type(
         ads_raw
     )
+
+    # --------------------------------------------------------
+    # Standard reporting outputs
+    # --------------------------------------------------------
 
     zero_activity_df = build_zero_activity_report(
         ads_raw
@@ -280,6 +335,83 @@ def main() -> None:
         holiday_map,
     )
 
+    category_df = add_analysis_period(
+        category_df,
+        date_from,
+        date_to,
+    )
+
+    product_df = add_analysis_period(
+        product_df,
+        date_from,
+        date_to,
+    )
+
+    holiday_impact_df = add_analysis_period(
+        holiday_impact_df,
+        date_from,
+        date_to,
+    )
+
+    daily_df = add_analysis_period(
+        daily_df,
+        date_from,
+        date_to,
+    )
+
+    weekly_df = add_analysis_period(
+        weekly_df,
+        date_from,
+        date_to,
+    )
+
+    monthly_df = add_analysis_period(
+        monthly_df,
+        date_from,
+        date_to,
+    )
+
+    zero_activity_df = add_analysis_period(
+        zero_activity_df,
+        date_from,
+        date_to,
+    )
+
+    # --------------------------------------------------------
+    # New campaign proposals
+    # --------------------------------------------------------
+
+    new_campaign_proposals_df = (
+        build_new_campaign_proposals(
+            ads_df=ads_raw,
+            target_roas=TARGET_ROAS,
+            holiday_map=holiday_map,
+            max_proposals=5,
+            test_duration_days=14,
+        )
+    )
+
+    new_campaign_proposals_df = add_analysis_period(
+        new_campaign_proposals_df,
+        date_from,
+        date_to,
+    )
+
+    if new_campaign_proposals_df.empty:
+        logger.warning(
+            "No evidence-based new campaign proposal "
+            "could be generated for this period."
+        )
+    else:
+        logger.info(
+            "New campaign proposals generated. Rows: %d",
+            len(new_campaign_proposals_df),
+        )
+
+    # --------------------------------------------------------
+    # Training data
+    # --------------------------------------------------------
+
     train_df = prepare_training_data(
         ads_raw,
         holiday_map,
@@ -292,11 +424,26 @@ def main() -> None:
         "ads_daily_fact": daily_df,
         "ads_weekly_campaign_summary": weekly_df,
         "ads_monthly_campaign_summary": monthly_df,
-        "ads_zero_activity_campaigns": zero_activity_df,
+        "ads_zero_activity_campaigns": (
+            zero_activity_df
+        ),
+        "ads_new_campaign_proposals": (
+            new_campaign_proposals_df
+        ),
     }
 
     if not ga4_raw.empty:
-        common_outputs["ga4_campaign_performance"] = ga4_raw
+        common_outputs[
+            "ga4_campaign_performance"
+        ] = add_analysis_period(
+            ga4_raw,
+            date_from,
+            date_to,
+        )
+
+    # --------------------------------------------------------
+    # Rule-based fallback
+    # --------------------------------------------------------
 
     if train_df.empty or len(train_df) < 20:
         logger.warning(
@@ -315,10 +462,22 @@ def main() -> None:
             max_campaigns=LLM_MAX_CAMPAIGNS,
         )
 
+        fallback_df = add_analysis_period(
+            fallback_df,
+            date_from,
+            date_to,
+        )
+
         outputs = {
-            "ads_rule_based_fallback_recommendations": fallback_df,
+            "ads_rule_based_fallback_recommendations": (
+                fallback_df
+            ),
             **common_outputs,
         }
+
+    # --------------------------------------------------------
+    # Machine-learning pipeline
+    # --------------------------------------------------------
 
     else:
         logger.info(
@@ -343,7 +502,8 @@ def main() -> None:
 
         if latest_df.empty:
             raise ValueError(
-                "Latest campaign state could not be created."
+                "Latest campaign state could not "
+                "be created."
             )
 
         type_map = (
@@ -374,6 +534,10 @@ def main() -> None:
             .fillna("Generic")
         )
 
+        # ----------------------------------------------------
+        # Budget scenarios
+        # ----------------------------------------------------
+
         sim_df = simulate_budget_scenarios(
             latest_df,
             model_conv,
@@ -383,7 +547,8 @@ def main() -> None:
 
         if sim_df.empty:
             raise ValueError(
-                "Budget scenario simulation returned no data."
+                "Budget scenario simulation returned "
+                "no data."
             )
 
         best_df = choose_optimal_scenario(
@@ -395,9 +560,15 @@ def main() -> None:
             sim_df,
         )
 
-        recommendation_df = build_action_recommendation(
-            best_df,
-            TARGET_ROAS,
+        # ----------------------------------------------------
+        # Existing campaign recommendations
+        # ----------------------------------------------------
+
+        recommendation_df = (
+            build_action_recommendation(
+                best_df,
+                TARGET_ROAS,
+            )
         )
 
         recommendation_df = build_confidence_scores(
@@ -406,8 +577,11 @@ def main() -> None:
             train_df,
         )
 
-        recommendation_df = apply_confidence_guardrail(
-            recommendation_df
+        recommendation_df = (
+            apply_confidence_guardrail(
+                recommendation_df,
+                target_roas=TARGET_ROAS,
+            )
         )
 
         recommendation_df["ROAS"] = (
@@ -423,6 +597,10 @@ def main() -> None:
             recommendation_df
         )
 
+        # ----------------------------------------------------
+        # Portfolio allocation
+        # ----------------------------------------------------
+
         portfolio_df = build_portfolio_allocation(
             recommendation_df
         )
@@ -436,6 +614,50 @@ def main() -> None:
             TARGET_ROAS,
             max_campaigns=LLM_MAX_CAMPAIGNS,
         )
+
+        # ----------------------------------------------------
+        # Add analysis period to ML outputs
+        # ----------------------------------------------------
+
+        sim_df = add_analysis_period(
+            sim_df,
+            date_from,
+            date_to,
+        )
+
+        recommendation_df = add_analysis_period(
+            recommendation_df,
+            date_from,
+            date_to,
+        )
+
+        portfolio_df = add_analysis_period(
+            portfolio_df,
+            date_from,
+            date_to,
+        )
+
+        summary_df = add_analysis_period(
+            summary_df,
+            date_from,
+            date_to,
+        )
+
+        metrics_df = add_analysis_period(
+            metrics_df,
+            date_from,
+            date_to,
+        )
+
+        feature_importance_df = add_analysis_period(
+            feature_importance_df,
+            date_from,
+            date_to,
+        )
+
+        # ----------------------------------------------------
+        # Portfolio commentary
+        # ----------------------------------------------------
 
         portfolio_commentary = (
             generate_portfolio_summary_commentary(
@@ -471,18 +693,34 @@ def main() -> None:
 
         outputs = {
             "ads_budget_scenarios": sim_df,
-            "ads_budget_optimization_recommendations": recommendation_df,
-            "ads_portfolio_budget_allocation": portfolio_df,
+            "ads_budget_optimization_recommendations": (
+                recommendation_df
+            ),
+            "ads_portfolio_budget_allocation": (
+                portfolio_df
+            ),
             "ads_recommendation_summary": summary_df,
-            "ads_model_validation_metrics": metrics_df,
-            "ads_feature_importance": feature_importance_df,
+            "ads_model_validation_metrics": (
+                metrics_df
+            ),
+            "ads_feature_importance": (
+                feature_importance_df
+            ),
             **common_outputs,
         }
+
+    # --------------------------------------------------------
+    # CSV exports
+    # --------------------------------------------------------
 
     export_csv(
         outputs,
         OUTPUT_DIR,
     )
+
+    # --------------------------------------------------------
+    # Optional PostgreSQL export
+    # --------------------------------------------------------
 
     postgres_engine = get_postgres_engine()
 
@@ -503,6 +741,7 @@ if __name__ == "__main__":
 
     except Exception:
         logger.exception(
-            "Pipeline failed because of an unexpected error."
+            "Pipeline failed because of an "
+            "unexpected error."
         )
         raise
