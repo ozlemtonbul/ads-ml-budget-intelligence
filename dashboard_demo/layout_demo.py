@@ -32,7 +32,7 @@ _DATE_COLUMN_CANDIDATES = {
 }
 
 
-_DEMO_FILTER_STATE_VERSION = 2
+_DEMO_FILTER_STATE_VERSION = 3
 
 
 def _parse_demo_date(value: Any) -> date | None:
@@ -360,11 +360,9 @@ def render_interactive_filter_bar(
 
     # Demo tarih filtreleri canlı güne göre değil, anonim veri setinin
     # mevcut son tarihine göre hesaplanır.
-    date_reference = (
-        reference_date
-        if reference_date is not None
-        else _get_demo_reference_date()
-    )
+    # Public demo veri seti 01.01.2026–31.01.2026 dönemini içerir.
+    # Sayfalardan gönderilen tarih veya sistem tarihi dikkate alınmaz.
+    date_reference = date(2026, 1, 31)
 
     # Public demo bütün sayfalarda veri bulunan ayla açılır.
     # Eski sayfalardan "last_30_days" gönderilse bile demo başlangıcı
