@@ -1,0 +1,101 @@
+﻿CampaignId,Campaign,Channel,CampaignType,Category,ProductGroup,Season,IsHoliday,IsPreHoliday,HolidayName,ExpectedROASMultiplier,HistoryRows,CurrentSpend,ScenarioFactor,ScenarioSpend,PredictedConversions,PredictedRevenue,PredictedProfit,PredictedROAS,AnalysisStartDate,AnalysisEndDate
+9578217962,Demo Campaign 001,Demo Channel 001,Brand,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,264.11,0.75,198.09,0.1962,675.05,476.96,3.4079,2026-01-01,2026-01-31
+9578217962,Demo Campaign 001,Demo Channel 001,Brand,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,264.11,0.9,237.7,0.2065,652.07,414.37,2.7432,2026-01-01,2026-01-31
+9578217962,Demo Campaign 001,Demo Channel 001,Brand,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,264.11,1.0,264.11,0.2065,651.1,386.98,2.4652,2026-01-01,2026-01-31
+9578217962,Demo Campaign 001,Demo Channel 001,Brand,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,264.11,1.1,290.53,0.2012,654.69,364.17,2.2535,2026-01-01,2026-01-31
+9578217962,Demo Campaign 001,Demo Channel 001,Brand,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,264.11,1.25,330.14,0.2065,664.79,334.65,2.0137,2026-01-01,2026-01-31
+9578238131,Demo Campaign 002,Demo Channel 001,Generic,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,184.04,0.5,92.02,0.1057,279.88,187.86,3.0415,2026-01-01,2026-01-31
+9578238131,Demo Campaign 002,Demo Channel 001,Generic,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,184.04,0.75,138.03,0.1038,265.73,127.7,1.9252,2026-01-01,2026-01-31
+9578238131,Demo Campaign 002,Demo Channel 001,Generic,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,184.04,1.0,184.04,0.0959,285.73,101.69,1.5526,2026-01-01,2026-01-31
+9578238131,Demo Campaign 002,Demo Channel 001,Generic,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,184.04,1.2,220.85,0.1059,414.63,193.78,1.8775,2026-01-01,2026-01-31
+9578238131,Demo Campaign 002,Demo Channel 001,Generic,Demo Category 001,İlk Adım,Winter,0,0,,1.15,0,184.04,1.5,276.06,0.1201,507.92,231.86,1.8399,2026-01-01,2026-01-31
+9583350882,Demo Campaign 003,Demo Channel 001,Brand,Demo Category 002,Typo,Winter,0,0,,1.15,0,46.14,0.75,34.61,0.0024,4.32,-30.29,0.1247,2026-01-01,2026-01-31
+9583350882,Demo Campaign 003,Demo Channel 001,Brand,Demo Category 002,Typo,Winter,0,0,,1.15,0,46.14,0.9,41.53,0.0024,4.32,-37.21,0.1039,2026-01-01,2026-01-31
+9583350882,Demo Campaign 003,Demo Channel 001,Brand,Demo Category 002,Typo,Winter,0,0,,1.15,0,46.14,1.0,46.14,0.0024,4.32,-41.83,0.0936,2026-01-01,2026-01-31
+9583350882,Demo Campaign 003,Demo Channel 001,Brand,Demo Category 002,Typo,Winter,0,0,,1.15,0,46.14,1.1,50.76,0.263,865.34,814.59,17.0485,2026-01-01,2026-01-31
+9583350882,Demo Campaign 003,Demo Channel 001,Brand,Demo Category 002,Typo,Winter,0,0,,1.15,0,46.14,1.25,57.68,0.263,865.34,807.67,15.0027,2026-01-01,2026-01-31
+15279128835,Demo Campaign 004,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,67.07,0.5,33.53,0.0831,128.15,94.62,3.8215,2026-01-01,2026-01-31
+15279128835,Demo Campaign 004,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,67.07,0.75,50.3,0.0654,126.46,76.16,2.5141,2026-01-01,2026-01-31
+15279128835,Demo Campaign 004,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,67.07,1.0,67.07,0.0677,180.82,113.75,2.696,2026-01-01,2026-01-31
+15279128835,Demo Campaign 004,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,67.07,1.2,80.48,0.0744,162.97,82.49,2.0249,2026-01-01,2026-01-31
+15279128835,Demo Campaign 004,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,67.07,1.5,100.6,0.0809,162.17,61.56,1.6119,2026-01-01,2026-01-31
+15279271152,Demo Campaign 005,Demo Channel 001,Generic,Demo Category 001,İlk Adım Jenerik,Winter,0,0,,1.15,0,13.76,0.5,6.88,0.0411,91.49,84.61,13.2981,2026-01-01,2026-01-31
+15279271152,Demo Campaign 005,Demo Channel 001,Generic,Demo Category 001,İlk Adım Jenerik,Winter,0,0,,1.15,0,13.76,0.75,10.32,0.0376,99.68,89.36,9.6586,2026-01-01,2026-01-31
+15279271152,Demo Campaign 005,Demo Channel 001,Generic,Demo Category 001,İlk Adım Jenerik,Winter,0,0,,1.15,0,13.76,1.0,13.76,0.0386,89.61,75.85,6.5124,2026-01-01,2026-01-31
+15279271152,Demo Campaign 005,Demo Channel 001,Generic,Demo Category 001,İlk Adım Jenerik,Winter,0,0,,1.15,0,13.76,1.2,16.51,0.0427,98.72,82.21,5.9786,2026-01-01,2026-01-31
+15279271152,Demo Campaign 005,Demo Channel 001,Generic,Demo Category 001,İlk Adım Jenerik,Winter,0,0,,1.15,0,13.76,1.5,20.64,0.0928,158.38,137.74,7.6736,2026-01-01,2026-01-31
+15284730209,Demo Campaign 006,Demo Channel 001,Brand,Demo Category 003,Erkek Bebek,Winter,0,0,,1.15,0,7.44,0.75,5.58,0.2085,288.37,282.79,51.6786,2026-01-01,2026-01-31
+15284730209,Demo Campaign 006,Demo Channel 001,Brand,Demo Category 003,Erkek Bebek,Winter,0,0,,1.15,0,7.44,0.9,6.7,0.2123,287.94,281.24,43.0016,2026-01-01,2026-01-31
+15284730209,Demo Campaign 006,Demo Channel 001,Brand,Demo Category 003,Erkek Bebek,Winter,0,0,,1.15,0,7.44,1.0,7.44,0.2085,260.22,252.78,34.9757,2026-01-01,2026-01-31
+15284730209,Demo Campaign 006,Demo Channel 001,Brand,Demo Category 003,Erkek Bebek,Winter,0,0,,1.15,0,7.44,1.1,8.18,0.2087,269.2,261.02,32.8934,2026-01-01,2026-01-31
+15284730209,Demo Campaign 006,Demo Channel 001,Brand,Demo Category 003,Erkek Bebek,Winter,0,0,,1.15,0,7.44,1.25,9.3,0.1779,278.63,269.33,29.96,2026-01-01,2026-01-31
+15289528968,Demo Campaign 007,Demo Channel 001,Brand,Demo Category 004,Bebek Jenerik,Winter,0,0,,1.15,0,49.89,0.75,37.42,0.6737,1307.9,1270.48,34.9513,2026-01-01,2026-01-31
+15289528968,Demo Campaign 007,Demo Channel 001,Brand,Demo Category 004,Bebek Jenerik,Winter,0,0,,1.15,0,49.89,0.9,44.9,0.6517,1222.94,1178.04,27.234,2026-01-01,2026-01-31
+15289528968,Demo Campaign 007,Demo Channel 001,Brand,Demo Category 004,Bebek Jenerik,Winter,0,0,,1.15,0,49.89,1.0,49.89,0.6158,1172.91,1123.02,23.508,2026-01-01,2026-01-31
+15289528968,Demo Campaign 007,Demo Channel 001,Brand,Demo Category 004,Bebek Jenerik,Winter,0,0,,1.15,0,49.89,1.1,54.88,0.6062,1273.45,1218.57,23.2028,2026-01-01,2026-01-31
+15289528968,Demo Campaign 007,Demo Channel 001,Brand,Demo Category 004,Bebek Jenerik,Winter,0,0,,1.15,0,49.89,1.25,62.37,0.5941,1248.13,1185.77,20.0124,2026-01-01,2026-01-31
+15292171372,Demo Campaign 008,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,30.76,0.5,15.38,0.0812,152.91,137.53,9.9423,2026-01-01,2026-01-31
+15292171372,Demo Campaign 008,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,30.76,0.75,23.07,0.0575,100.53,77.46,4.3576,2026-01-01,2026-01-31
+15292171372,Demo Campaign 008,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,30.76,1.0,30.76,0.0492,100.53,69.77,3.2682,2026-01-01,2026-01-31
+15292171372,Demo Campaign 008,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,30.76,1.2,36.91,0.0474,98.52,61.61,2.6691,2026-01-01,2026-01-31
+15292171372,Demo Campaign 008,Demo Channel 001,Generic,Demo Category 003,Erkek Çocuk,Winter,0,0,,1.15,0,30.76,1.5,46.14,0.0594,188.03,141.89,4.0752,2026-01-01,2026-01-31
+15292647241,Demo Campaign 009,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,39.48,0.75,29.61,0.0856,274.98,245.37,9.2869,2026-01-01,2026-01-31
+15292647241,Demo Campaign 009,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,39.48,0.9,35.53,0.1066,292.37,256.84,8.2285,2026-01-01,2026-01-31
+15292647241,Demo Campaign 009,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,39.48,1.0,39.48,0.0914,271.02,231.54,6.8648,2026-01-01,2026-01-31
+15292647241,Demo Campaign 009,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,39.48,1.1,43.43,0.0955,339.1,295.68,7.8084,2026-01-01,2026-01-31
+15292647241,Demo Campaign 009,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,39.48,1.25,49.35,0.0974,393.34,343.99,7.9704,2026-01-01,2026-01-31
+15295133735,Demo Campaign 010,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,190.4,0.75,142.8,0.0926,181.16,38.36,1.2686,2026-01-01,2026-01-31
+15295133735,Demo Campaign 010,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,190.4,0.9,171.36,0.1037,254.7,83.34,1.4864,2026-01-01,2026-01-31
+15295133735,Demo Campaign 010,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,190.4,1.0,190.4,0.1178,254.38,63.98,1.336,2026-01-01,2026-01-31
+15295133735,Demo Campaign 010,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,190.4,1.1,209.44,0.1558,472.02,262.58,2.2537,2026-01-01,2026-01-31
+15295133735,Demo Campaign 010,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,190.4,1.25,238.0,0.1932,518.16,280.16,2.1771,2026-01-01,2026-01-31
+15295341491,Demo Campaign 011,Demo Channel 001,Generic,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,0.0,0.5,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+15295341491,Demo Campaign 011,Demo Channel 001,Generic,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,0.0,0.75,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+15295341491,Demo Campaign 011,Demo Channel 001,Generic,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+15295341491,Demo Campaign 011,Demo Channel 001,Generic,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,0.0,1.2,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+15295341491,Demo Campaign 011,Demo Channel 001,Generic,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,0.0,1.5,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+15295405667,Demo Campaign 012,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,15.62,0.75,11.71,0.0649,175.78,164.06,15.0045,2026-01-01,2026-01-31
+15295405667,Demo Campaign 012,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,15.62,0.9,14.06,0.0651,175.78,161.72,12.5037,2026-01-01,2026-01-31
+15295405667,Demo Campaign 012,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,15.62,1.0,15.62,0.0657,192.27,176.65,12.3092,2026-01-01,2026-01-31
+15295405667,Demo Campaign 012,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,15.62,1.1,17.18,0.0712,192.27,175.09,11.1902,2026-01-01,2026-01-31
+15295405667,Demo Campaign 012,Demo Channel 001,Brand,Demo Category 005,Kız Çocuk,Winter,0,0,,1.15,0,15.62,1.25,19.52,0.0654,197.14,177.61,10.0965,2026-01-01,2026-01-31
+17566003095,Demo Campaign 013,Demo Channel 001,Brand,Demo Category 006,Trendyol,Winter,0,0,,1.15,0,0.0,0.75,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+17566003095,Demo Campaign 013,Demo Channel 001,Brand,Demo Category 006,Trendyol,Winter,0,0,,1.15,0,0.0,0.9,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+17566003095,Demo Campaign 013,Demo Channel 001,Brand,Demo Category 006,Trendyol,Winter,0,0,,1.15,0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+17566003095,Demo Campaign 013,Demo Channel 001,Brand,Demo Category 006,Trendyol,Winter,0,0,,1.15,0,0.0,1.1,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+17566003095,Demo Campaign 013,Demo Channel 001,Brand,Demo Category 006,Trendyol,Winter,0,0,,1.15,0,0.0,1.25,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+20475545240,Demo Campaign 014,Demo Channel 001,Brand,Demo Category 007,Ortopedik,Winter,0,0,,1.15,0,78.61,0.75,58.96,0.1166,201.13,142.17,3.4113,2026-01-01,2026-01-31
+20475545240,Demo Campaign 014,Demo Channel 001,Brand,Demo Category 007,Ortopedik,Winter,0,0,,1.15,0,78.61,0.9,70.75,0.114,172.95,102.2,2.4445,2026-01-01,2026-01-31
+20475545240,Demo Campaign 014,Demo Channel 001,Brand,Demo Category 007,Ortopedik,Winter,0,0,,1.15,0,78.61,1.0,78.61,0.1008,193.91,115.3,2.4667,2026-01-01,2026-01-31
+20475545240,Demo Campaign 014,Demo Channel 001,Brand,Demo Category 007,Ortopedik,Winter,0,0,,1.15,0,78.61,1.1,86.47,0.1209,265.57,179.09,3.071,2026-01-01,2026-01-31
+20475545240,Demo Campaign 014,Demo Channel 001,Brand,Demo Category 007,Ortopedik,Winter,0,0,,1.15,0,78.61,1.25,98.27,0.1125,296.32,198.06,3.0155,2026-01-01,2026-01-31
+20489229803,Demo Campaign 015,Demo Channel 001,Generic,Demo Category 008,Okul Ayakkabısı,Winter,0,0,,1.15,0,21.39,0.5,10.7,0.0775,217.3,206.61,20.3181,2026-01-01,2026-01-31
+20489229803,Demo Campaign 015,Demo Channel 001,Generic,Demo Category 008,Okul Ayakkabısı,Winter,0,0,,1.15,0,21.39,0.75,16.04,0.1047,223.61,207.57,13.9389,2026-01-01,2026-01-31
+20489229803,Demo Campaign 015,Demo Channel 001,Generic,Demo Category 008,Okul Ayakkabısı,Winter,0,0,,1.15,0,21.39,1.0,21.39,0.0613,146.67,125.28,6.8569,2026-01-01,2026-01-31
+20489229803,Demo Campaign 015,Demo Channel 001,Generic,Demo Category 008,Okul Ayakkabısı,Winter,0,0,,1.15,0,21.39,1.2,25.67,0.0659,178.21,152.55,6.943,2026-01-01,2026-01-31
+20489229803,Demo Campaign 015,Demo Channel 001,Generic,Demo Category 008,Okul Ayakkabısı,Winter,0,0,,1.15,0,21.39,1.5,32.09,0.0816,374.95,342.87,11.6862,2026-01-01,2026-01-31
+20686387846,Demo Campaign 016,Demo Channel 001,Generic,Demo Category 009,8 Yaş Ayakkabı,Winter,0,0,,1.15,0,0.0,0.5,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+20686387846,Demo Campaign 016,Demo Channel 001,Generic,Demo Category 009,8 Yaş Ayakkabı,Winter,0,0,,1.15,0,0.0,0.75,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+20686387846,Demo Campaign 016,Demo Channel 001,Generic,Demo Category 009,8 Yaş Ayakkabı,Winter,0,0,,1.15,0,0.0,1.0,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+20686387846,Demo Campaign 016,Demo Channel 001,Generic,Demo Category 009,8 Yaş Ayakkabı,Winter,0,0,,1.15,0,0.0,1.2,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+20686387846,Demo Campaign 016,Demo Channel 001,Generic,Demo Category 009,8 Yaş Ayakkabı,Winter,0,0,,1.15,0,0.0,1.5,0.0,0.0,0.0,0.0,0.0,2026-01-01,2026-01-31
+23248210925,Demo Campaign 017,Demo Channel 002,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,91.26,0.75,68.44,0.0429,123.75,55.3,1.808,2026-01-01,2026-01-31
+23248210925,Demo Campaign 017,Demo Channel 002,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,91.26,0.9,82.13,0.0424,123.75,41.62,1.5067,2026-01-01,2026-01-31
+23248210925,Demo Campaign 017,Demo Channel 002,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,91.26,1.0,91.26,0.0479,114.77,23.51,1.2576,2026-01-01,2026-01-31
+23248210925,Demo Campaign 017,Demo Channel 002,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,91.26,1.1,100.39,0.0479,114.77,14.38,1.1433,2026-01-01,2026-01-31
+23248210925,Demo Campaign 017,Demo Channel 002,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,91.26,1.25,114.07,0.0479,114.77,0.69,1.0061,2026-01-01,2026-01-31
+23248260653,Demo Campaign 018,Demo Channel 002,Brand,Demo Category 011,Topic,Winter,0,0,,1.15,0,82.57,0.75,61.93,0.0392,125.61,63.69,2.0285,2026-01-01,2026-01-31
+23248260653,Demo Campaign 018,Demo Channel 002,Brand,Demo Category 011,Topic,Winter,0,0,,1.15,0,82.57,0.9,74.31,0.0387,125.61,51.3,1.6904,2026-01-01,2026-01-31
+23248260653,Demo Campaign 018,Demo Channel 002,Brand,Demo Category 011,Topic,Winter,0,0,,1.15,0,82.57,1.0,82.57,0.0387,125.61,43.05,1.5213,2026-01-01,2026-01-31
+23248260653,Demo Campaign 018,Demo Channel 002,Brand,Demo Category 011,Topic,Winter,0,0,,1.15,0,82.57,1.1,90.82,0.0447,130.71,39.89,1.4392,2026-01-01,2026-01-31
+23248260653,Demo Campaign 018,Demo Channel 002,Brand,Demo Category 011,Topic,Winter,0,0,,1.15,0,82.57,1.25,103.21,0.0443,123.86,20.65,1.2001,2026-01-01,2026-01-31
+23252380969,Demo Campaign 019,Demo Channel 002,Brand,Demo Category 012,Interest,Winter,0,0,,1.15,0,91.09,0.75,68.32,0.048,114.05,45.73,1.6693,2026-01-01,2026-01-31
+23252380969,Demo Campaign 019,Demo Channel 002,Brand,Demo Category 012,Interest,Winter,0,0,,1.15,0,91.09,0.9,81.98,0.0465,114.05,32.06,1.3911,2026-01-01,2026-01-31
+23252380969,Demo Campaign 019,Demo Channel 002,Brand,Demo Category 012,Interest,Winter,0,0,,1.15,0,91.09,1.0,91.09,0.0521,112.29,21.2,1.2327,2026-01-01,2026-01-31
+23252380969,Demo Campaign 019,Demo Channel 002,Brand,Demo Category 012,Interest,Winter,0,0,,1.15,0,91.09,1.1,100.2,0.0521,112.29,12.09,1.1206,2026-01-01,2026-01-31
+23252380969,Demo Campaign 019,Demo Channel 002,Brand,Demo Category 012,Interest,Winter,0,0,,1.15,0,91.09,1.25,113.87,0.0521,112.29,-1.58,0.9862,2026-01-01,2026-01-31
+23253214474,Demo Campaign 020,Demo Channel 003,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,30.15,0.75,22.61,0.0374,121.03,98.42,5.3519,2026-01-01,2026-01-31
+23253214474,Demo Campaign 020,Demo Channel 003,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,30.15,0.9,27.14,0.0415,140.05,112.91,5.1605,2026-01-01,2026-01-31
+23253214474,Demo Campaign 020,Demo Channel 003,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,30.15,1.0,30.15,0.0419,115.53,85.38,3.8315,2026-01-01,2026-01-31
+23253214474,Demo Campaign 020,Demo Channel 003,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,30.15,1.1,33.17,0.0449,129.67,96.51,3.9096,2026-01-01,2026-01-31
+23253214474,Demo Campaign 020,Demo Channel 003,Brand,Demo Category 010,CI,Winter,0,0,,1.15,0,30.15,1.25,37.69,0.0399,126.79,89.1,3.3638,2026-01-01,2026-01-31

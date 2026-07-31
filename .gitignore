@@ -79,3 +79,59 @@ htmlcov/
 .DS_Store
 Thumbs.db
 Desktop.ini
+# =========================================================
+# LOCAL ENVIRONMENT & SECRETS
+# =========================================================
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+google-ads.yaml
+client_secret*.json
+service_account*.json
+credentials*.json
+token*.json
+*.pem
+*.key
+
+# =========================================================
+# REAL / PRIVATE PROJECT OUTPUTS
+# =========================================================
+outputs/
+data/
+logs/
+staging/
+
+# =========================================================
+# PUBLIC DEMO TEMPORARY FILES
+# =========================================================
+demo_data/logs/
+demo_data/staging/
+demo_data/runs/
+demo_data/*backup*
+demo_data/*january*
+dashboard_demo/__pycache__/
+
+# =========================================================
+# IDE / OS
+# =========================================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# =========================================================
+# ADDITIONAL LOCAL DEMO FILES
+# =========================================================
+.gitignore_backup
+demo_data_backup/
+outputs-demo-review.zip
+demo_data/logs/
+demo_data/staging/
+
+# Accidental demo file inside the production dashboard
+dashboard/services/analysis_runner_demo.py
