@@ -79,9 +79,10 @@ def _get_demo_reference_date() -> date:
 
     project_root = Path(__file__).resolve().parents[1]
 
+    # Public demo her zaman yalnızca anonim demo_data klasörünü
+    # referans alır. Canlı çıktı klasörlerindeki daha yeni tarihler,
+    # demo tarih filtresini etkilemez.
     directory_candidates = [
-        os.getenv("VICCO_OUTPUT_DIR"),
-        os.getenv("OUTPUT_DIR"),
         str(project_root / "demo_data"),
     ]
 
@@ -341,8 +342,8 @@ def render_page_header(
 
 
 def render_interactive_filter_bar(
-    default_preset: str = "last_30_days",
-    default_comparison: str = "previous_period",
+    default_preset: str = "this_month",
+    default_comparison: str = "no_comparison",
     reference_date: date | None = None,
 ) -> DashboardFilters:
     """
@@ -768,8 +769,8 @@ def initialize_dashboard(
     title: str,
     subtitle: str,
     eyebrow: str = "Advertising Decision Intelligence",
-    default_preset: str = "last_30_days",
-    default_comparison: str = "previous_period",
+    default_preset: str = "this_month",
+    default_comparison: str = "no_comparison",
     reference_date: date | None = None,
 ) -> DashboardContext:
     """
