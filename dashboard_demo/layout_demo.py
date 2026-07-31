@@ -1,7 +1,6 @@
 ﻿from __future__ import annotations
 
 import csv
-import os
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -31,6 +30,9 @@ _DATE_COLUMN_CANDIDATES = {
     "segments_date",
     "segmentsdate",
 }
+
+
+_DEMO_FILTER_STATE_VERSION = 2
 
 
 def _parse_demo_date(value: Any) -> date | None:
@@ -69,61 +71,26 @@ def _get_demo_reference_date() -> date:
     """
     Public demo için kullanılacak sanal bugünü belirle.
 
-    Öncelik sırası:
-    1. VICCO_OUTPUT_DIR
-    2. OUTPUT_DIR
-    3. Proje kökündeki demo_data
-
-    Ana proje verilerine veya canlı API'lere dokunulmaz.
+    Tarih yalnızca proje kökündeki anonim ``demo_data`` klasöründe
+    bulunan ``ads_daily_fact.csv`` dosyasından okunur. Canlı çıktı
+    klasörleri ve canlı API kaynakları referans alınmaz.
     """
 
     project_root = Path(__file__).resolve().parents[1]
+    csv_path = project_root / "demo_data" / "ads_daily_fact.csv"
 
-    # Public demo her zaman yalnızca anonim demo_data klasörünü
-    # referans alır. Canlı çıktı klasörlerindeki daha yeni tarihler,
-    # demo tarih filtresini etkilemez.
-    directory_candidates = [
-        str(project_root / "demo_data"),
-    ]
-
-    checked_directories: set[Path] = set()
     latest_date: date | None = None
 
-    for directory_value in directory_candidates:
-        if not directory_value:
-            continue
+    if csv_path.is_file():
+        try:
+            with csv_path.open(
+                "r",
+                encoding="utf-8-sig",
+                newline="",
+            ) as csv_file:
+                reader = csv.DictReader(csv_file)
 
-        directory = Path(directory_value).expanduser().resolve()
-
-        if directory in checked_directories:
-            continue
-
-        checked_directories.add(directory)
-
-        if not directory.exists():
-            continue
-
-        preferred_file = directory / "ads_daily_fact.csv"
-
-        if preferred_file.is_file():
-            csv_files = [preferred_file]
-        else:
-            csv_files = sorted(
-                directory.rglob("ads_daily_fact.csv")
-            )
-
-        for csv_path in csv_files:
-            try:
-                with csv_path.open(
-                    "r",
-                    encoding="utf-8-sig",
-                    newline="",
-                ) as csv_file:
-                    reader = csv.DictReader(csv_file)
-
-                    if not reader.fieldnames:
-                        continue
-
+                if reader.fieldnames:
                     date_column = next(
                         (
                             column
@@ -137,33 +104,32 @@ def _get_demo_reference_date() -> date:
                         None,
                     )
 
-                    if date_column is None:
-                        continue
-
-                    for row in reader:
-                        parsed_date = _parse_demo_date(
-                            row.get(date_column)
-                        )
-
-                        if (
-                            parsed_date is not None
-                            and (
-                                latest_date is None
-                                or parsed_date > latest_date
+                    if date_column is not None:
+                        for row in reader:
+                            parsed_date = _parse_demo_date(
+                                row.get(date_column)
                             )
-                        ):
-                            latest_date = parsed_date
 
-            except (
-                OSError,
-                UnicodeError,
-                csv.Error,
-            ):
-                continue
+                            if (
+                                parsed_date is not None
+                                and (
+                                    latest_date is None
+                                    or parsed_date > latest_date
+                                )
+                            ):
+                                latest_date = parsed_date
 
-        if latest_date is not None:
-            return latest_date
+        except (
+            OSError,
+            UnicodeError,
+            csv.Error,
+        ):
+            latest_date = None
 
+    if latest_date is not None:
+        return latest_date
+
+    # Demo CSV bulunamazsa uygulamanın açılmasını engelleme.
     return date.today() - timedelta(days=1)
 
 
@@ -356,6 +322,35 @@ def render_interactive_filter_bar(
     if "dashboard_language" not in st.session_state:
         st.session_state["dashboard_language"] = "tr"
 
+    # Daha önce tarayıcı oturumunda saklanan eski "Son 30 Gün" ve
+    # "Önceki Dönem" seçimlerini yalnızca bu sürüm ilk çalıştığında temizle.
+    # Sonraki etkileşimlerde kullanıcının yeni seçimi korunur.
+    if (
+        st.session_state.get("dashboard_demo_filter_state_version")
+        != _DEMO_FILTER_STATE_VERSION
+    ):
+        keys_to_reset = (
+            "dashboard_selected_preset",
+            "dashboard_selected_comparison",
+            "dashboard_toolbar_date_preset_tr",
+            "dashboard_toolbar_date_preset_en",
+            "dashboard_toolbar_comparison_tr",
+            "dashboard_toolbar_comparison_en",
+            "dashboard_toolbar_custom_date_range",
+            "dashboard_toolbar_custom_comparison_range",
+        )
+
+        for state_key in keys_to_reset:
+            st.session_state.pop(state_key, None)
+
+        st.session_state["dashboard_selected_preset"] = "this_month"
+        st.session_state["dashboard_selected_comparison"] = (
+            "no_comparison"
+        )
+        st.session_state["dashboard_demo_filter_state_version"] = (
+            _DEMO_FILTER_STATE_VERSION
+        )
+
     source_status = get_source_status()
 
     sources_ready = bool(
@@ -370,6 +365,12 @@ def render_interactive_filter_bar(
         if reference_date is not None
         else _get_demo_reference_date()
     )
+
+    # Public demo bütün sayfalarda veri bulunan ayla açılır.
+    # Eski sayfalardan "last_30_days" gönderilse bile demo başlangıcı
+    # güvenli biçimde "this_month / no_comparison" olarak normalize edilir.
+    default_preset = "this_month"
+    default_comparison = "no_comparison"
 
     language_column, date_column = st.columns([1, 3])
 

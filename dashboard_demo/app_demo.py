@@ -101,8 +101,8 @@ context = initialize_dashboard(
         "decision-support layer."
     ),
     eyebrow="AI Campaign Intelligence Platform - Public Demo",
-    default_preset="last_30_days",
-    default_comparison="previous_period",
+    default_preset="this_month",
+    default_comparison="no_comparison",
     reference_date=available_end,
 )
 
