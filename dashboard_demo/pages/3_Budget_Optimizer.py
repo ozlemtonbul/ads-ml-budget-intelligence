@@ -1,5 +1,7 @@
 ﻿from __future__ import annotations
 
+from datetime import date
+
 import sys
 from pathlib import Path
 
@@ -22,7 +24,7 @@ from dashboard_demo.components.export import render_export_buttons
 from dashboard_demo.components.tables import (
     hide_native_dataframe_toolbar,
 )
-from dashboard_demo.layout import (
+from dashboard_demo.layout_demo import (
     initialize_dashboard,
     localized_text,
     render_read_only_footer,
@@ -997,7 +999,7 @@ context = initialize_dashboard(
             "outcomes."
         ),
     ),
-    reference_date=available_end,
+    reference_date=date(2026, 1, 31),
 )
 
 language = context.language
@@ -1314,6 +1316,9 @@ render_export_buttons(
 )
 
 render_read_only_footer(language)
+
+
+
 
 
 

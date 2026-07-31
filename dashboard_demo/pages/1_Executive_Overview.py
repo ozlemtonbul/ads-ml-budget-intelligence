@@ -1,5 +1,7 @@
 ﻿from __future__ import annotations
 
+from datetime import date
+
 import sys
 from pathlib import Path
 
@@ -40,7 +42,7 @@ from dashboard_demo.components.tables import (
     render_optimization_table,
 )
 from dashboard_demo.i18n import translate
-from dashboard_demo.layout import (
+from dashboard_demo.layout_demo import (
     initialize_dashboard,
     localized_text,
     render_read_only_footer,
@@ -106,7 +108,7 @@ context = initialize_dashboard(
         "executive_overview_description",
         initial_language,
     ),
-    reference_date=available_end,
+    reference_date=date(2026, 1, 31),
 )
 
 language = context.language
@@ -545,6 +547,9 @@ render_detailed_data(
 render_read_only_footer(
     language
 )
+
+
+
 
 
 
