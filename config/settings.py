@@ -263,8 +263,18 @@ LLM_MAX_CAMPAIGNS = _get_int(
 
 LLM_MAX_TOKENS = _get_int(
     "LLM_MAX_TOKENS",
-    1200,
+    800,
 )
+
+LLM_DAILY_REQUEST_LIMIT = _get_int(
+    "LLM_DAILY_REQUEST_LIMIT",
+    20,
+)
+
+LLM_USAGE_FILE = os.getenv(
+    "LLM_USAGE_FILE",
+    "./outputs/llm_usage.json",
+).strip()
 
 LLM_TEMPERATURE = _get_float(
     "LLM_TEMPERATURE",

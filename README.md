@@ -2,8 +2,9 @@
 | | Link |
 |--|--|
 | Ads 2023/2024 · 2024/2025 · 2026 YTD | [View Dashboard →](https://ozlemtonbul.github.io/dashboards/ads_dashboard.html) |
+| AI / ML / LLM Ads Budget Intelligence AI Agent Demo | [Launch Public Demo →](https://ads-ai-ml-llm-intelligence.streamlit.app/) |
 
-# Ads Budget Intelligence
+# # Ads Budget Intelligence AI Agent
 
 > **Enterprise AI-Powered Marketing Decision Intelligence Platform**
 
@@ -41,11 +42,14 @@ Unlike traditional reporting solutions, the platform predicts future campaign pe
 - OpenAI GPT support
 - Google Gemini support
 - AI-generated executive commentary
-- Rule-based AI fallback
+- Rule-based / deterministic AI fallback
+- LLM usage guard and configurable cost controls
+- Interactive Streamlit decision dashboard
+- Public anonymized demo deployment
 - PostgreSQL integration
 - Docker support
 - GitHub Actions CI
-- **151 automated unit tests**
+- **203 automated tests passing**
 - Power BI ready
 
 ---
@@ -162,6 +166,7 @@ src/
 │
 ├── llm/
 │      LLM Manager
+│      LLM Usage Guard
 │      Base Provider Interface
 │
 │      providers/
@@ -197,6 +202,7 @@ src/
 | AI | Multi-LLM (Anthropic Claude • OpenAI GPT • Google Gemini) |
 | Database | PostgreSQL |
 | Containerization | Docker |
+| Interactive App | Streamlit |
 | Reporting | Power BI |
 | Testing | Pytest |
 | CI | GitHub Actions |
@@ -242,6 +248,7 @@ ads-budget-intelligence/
 │   │   │   ├── openai_provider.py
 │   │   │   └── gemini_provider.py
 │   │   ├── manager.py
+│   │   ├── usage_guard.py
 │   │   ├── base.py
 │   │   └── __init__.py
 │   ├── models/
@@ -321,6 +328,9 @@ The platform provides an end-to-end analytics workflow including:
 - Recommendation engine
 - Confidence scoring
 - Executive AI commentary
+- Configurable LLM request/token limits
+- Interactive Streamlit dashboard
+- Public anonymized demo mode
 - CSV reporting
 - PostgreSQL export
 - Power BI integration
@@ -535,6 +545,49 @@ Only one LLM provider is active at runtime. The active provider is selected usin
 If no API key is configured or the selected provider is unavailable, the platform automatically falls back to deterministic rule-based executive commentary, ensuring uninterrupted recommendation generation.
 
 The objective is to translate machine learning predictions and optimization results into clear, business-friendly insights for marketing managers, analysts, and executive stakeholders.
+---
+
+# LLM Cost & Usage Controls
+
+Live LLM generation is optional and disabled by default. The analytics, machine learning, optimization, and deterministic recommendation layers remain available without an LLM API key.
+
+The project includes a dedicated `src/llm/usage_guard.py` layer to reduce accidental API spend during local development. Current configurable controls include:
+
+- `LLM_ENABLED=false` by default
+- `LLM_PROVIDER=auto` for provider resolution when a single supported API key is configured
+- `LLM_MAX_TOKENS=800` maximum response-token setting
+- `LLM_DAILY_REQUEST_LIMIT=20` maximum successful live LLM requests per day
+- `LLM_USAGE_FILE=./outputs/llm_usage.json` local daily usage counter
+- Automatic blocking of additional live LLM requests when the configured daily limit is reached
+- Safe deterministic fallback when live LLM generation is disabled or unavailable
+
+These values are configuration defaults and can be changed through environment variables for different deployment requirements. API keys are never stored in source control.
+
+---
+
+# Interactive Streamlit Dashboard
+
+The project includes an interactive Streamlit decision-support interface for exploring campaign performance and model-driven recommendations.
+
+Dashboard modules include:
+
+- Executive Overview
+- Campaign Analysis
+- Budget Optimizer
+- AI Insights
+- Ask AI
+- Turkish / English interface support
+- Date-range and comparison-period controls
+- Campaign, category, and channel filtering
+
+## Public Demo
+
+A public portfolio demo is deployed with an anonymized dataset:
+
+**Public Streamlit Demo:** https://ads-ai-ml-llm-intelligence.streamlit.app/
+
+The public demo is intentionally isolated from the live production/local pipeline. It uses anonymized demo outputs and does **not** call live Google Ads or GA4 APIs. Live credentials, private company data, and local production outputs are not included in the public demo repository assets.
+
 ---
 
 # Output Files
@@ -783,13 +836,15 @@ Coverage includes:
 - PostgreSQL Export
 - Logger
 - Configuration
+- Multi-LLM runtime management
+- LLM daily usage guard / cost-control behavior
 - Main Pipeline
 
 ## Current Status
 
 Current status:
 
-- ✅ 151 Automated Tests Passing
+- ✅ 203 Automated Tests Passing
 - ✅ Pytest
 - ✅ Modular Unit Tests
 - ✅ Integration Tests
@@ -799,7 +854,9 @@ Current status:
 - ✅ Anthropic Claude Provider
 - ✅ OpenAI GPT Provider
 - ✅ Google Gemini Provider
-- ✅ Rule-based Fallback
+- ✅ Rule-based / Deterministic Fallback
+- ✅ LLM Daily Usage Guard
+- ✅ LLM Cost-Control Tests
 
 Run all tests:
 
@@ -834,7 +891,7 @@ The following files are intentionally excluded from version control:
 - `__pycache__/`
 - `.pytest_cache/`
 
-No company credentials or confidential datasets are included in this repository.
+No company credentials or confidential datasets are included in this repository. The public Streamlit deployment uses anonymized demo data and is separated from live Google Ads, GA4, local outputs, and private credentials.
 
 ---
 
@@ -853,18 +910,22 @@ No company credentials or confidential datasets are included in this repository.
 - ✅ Anthropic Provider
 - ✅ OpenAI Provider
 - ✅ Google Gemini Provider
-- ✅ Rule-based Fallback
+- ✅ Rule-based / Deterministic Fallback
+- ✅ LLM Daily Usage Guard
+- ✅ LLM Cost-Control Tests
 - ✅ AI-Generated Executive Commentary
 - ✅ CSV Export
 - ✅ PostgreSQL Export
 - ✅ Docker Support
 - ✅ Docker Compose
 - ✅ GitHub Actions CI
-- ✅ Automated Testing (151 Tests)
+- ✅ Automated Testing (203 Tests)
+- ✅ Interactive Streamlit Dashboard
+- ✅ Public Anonymized Streamlit Demo
+- ✅ LLM Usage Guard / Cost Controls
 
 ## Planned
 
-- Streamlit Dashboard
 - SHAP Explainability
 - Airflow Scheduling
 - XGBoost Models
@@ -889,10 +950,13 @@ The current version provides:
 - Budget optimization
 - Provider-independent Multi-LLM architecture
 - AI-generated executive commentary
+- Interactive Streamlit decision dashboard
+- Public anonymized demo deployment
+- LLM usage guard and configurable API cost controls
 - Docker support
 - PostgreSQL integration
 - GitHub Actions CI
-- 151 passing automated tests
+- 203 passing automated tests
 
 ---
 
@@ -905,11 +969,14 @@ The current version provides:
 | Google Analytics 4 | ✅ |
 | Machine Learning | ✅ |
 | Multi-LLM Support | ✅ |
+| LLM Usage Guard | ✅ |
+| Streamlit Dashboard | ✅ |
+| Public Anonymized Demo | ✅ |
 | Provider-Independent Architecture | ✅ |
 | Docker | ✅ |
 | PostgreSQL | ✅ |
 | GitHub Actions | ✅ |
-| Automated Tests | ✅ 151 Passing |
+| Automated Tests | ✅ 203 Passing |
 | Power BI Ready | ✅ |
 | Enterprise Architecture | ✅ |
 ---
@@ -918,7 +985,6 @@ The current version provides:
 
 Planned future improvements include:
 
-- Interactive Streamlit application
 - SHAP model explainability
 - Airflow orchestration
 - Real-time monitoring
@@ -963,3 +1029,4 @@ This repository is provided for portfolio and educational purposes.
 Company credentials, proprietary datasets, API keys and confidential business information are intentionally excluded from version control.
 
 © 2026 Özlem Tonbul. All rights reserved.
+
