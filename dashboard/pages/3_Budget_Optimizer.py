@@ -1277,6 +1277,99 @@ st.dataframe(
 
 
 # ---------------------------------------------------------
+# EXPLAINABILITY
+# ---------------------------------------------------------
+
+st.divider()
+st.subheader(
+    localized_text(
+        language,
+        "Bu Öneri Neden Verildi?",
+        "Why This Recommendation?",
+    )
+)
+
+if (
+    not recommendations_df.empty
+    and "Campaign" in recommendations_df.columns
+):
+    explain_campaign = st.selectbox(
+        localized_text(
+            language,
+            "Açıklanacak Kampanya",
+            "Campaign to Explain",
+        ),
+        options=recommendations_df["Campaign"].astype(str).tolist(),
+        key="budget_optimizer_explain_campaign",
+    )
+
+    explain_row = recommendations_df.loc[
+        recommendations_df["Campaign"].astype(str) == str(explain_campaign)
+    ].iloc[0]
+
+    why_text = str(
+        explain_row.get("WhyThisRecommendation", "") or ""
+    ).strip()
+
+    if why_text:
+        st.info(why_text)
+    else:
+        st.caption(
+            localized_text(
+                language,
+                "Bu çıktı için SHAP açıklaması bulunamadı.",
+                "No SHAP explanation is available for this output.",
+            )
+        )
+
+    driver_cols = st.columns(2)
+    revenue_text = str(
+        explain_row.get("RevenueTopDrivers", "") or ""
+    ).strip()
+    conversion_text = str(
+        explain_row.get("ConversionTopDrivers", "") or ""
+    ).strip()
+
+    with driver_cols[0]:
+        st.markdown(
+            "**"
+            + localized_text(
+                language,
+                "Gelir tahmini — en güçlü 3 model etkisi",
+                "Revenue forecast — Top 3 model contributions",
+            )
+            + "**"
+        )
+        st.write(revenue_text or "—")
+
+    with driver_cols[1]:
+        st.markdown(
+            "**"
+            + localized_text(
+                language,
+                "Dönüşüm tahmini — en güçlü 3 model etkisi",
+                "Conversion forecast — Top 3 model contributions",
+            )
+            + "**"
+        )
+        st.write(conversion_text or "—")
+
+    st.caption(
+        localized_text(
+            language,
+            (
+                "SHAP değerleri model tahminine katkıyı açıklar; "
+                "gerçek dünyada nedensellik iddiası değildir."
+            ),
+            (
+                "SHAP values explain contribution to the model prediction; "
+                "they do not establish real-world causality."
+            ),
+        )
+    )
+
+
+# ---------------------------------------------------------
 # SCENARIO EXPLORER
 # ---------------------------------------------------------
 

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import List, Sequence, Tuple
+from time import perf_counter
+from typing import Any, List, Sequence, Tuple
 
 import numpy as np
 import pandas as pd
+from lightgbm import LGBMRegressor
 from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
 from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,
@@ -246,16 +249,212 @@ def _prepare_model_dataframe(
     return model_df
 
 
+def _build_candidate_models() -> dict[str, Any]:
+    """Build fresh candidate regressors for one prediction target."""
+    return {
+        "Random Forest": RandomForestRegressor(
+            n_estimators=250,
+            max_depth=8,
+            min_samples_leaf=2,
+            random_state=42,
+            n_jobs=-1,
+        ),
+        "XGBoost": XGBRegressor(
+            n_estimators=250,
+            max_depth=6,
+            learning_rate=0.05,
+            subsample=0.90,
+            colsample_bytree=0.90,
+            objective="reg:squarederror",
+            random_state=42,
+            n_jobs=-1,
+        ),
+        "LightGBM": LGBMRegressor(
+            n_estimators=250,
+            max_depth=8,
+            learning_rate=0.05,
+            num_leaves=31,
+            subsample=0.90,
+            colsample_bytree=0.90,
+            random_state=42,
+            n_jobs=-1,
+            verbosity=-1,
+        ),
+    }
+
+
+def _evaluate_candidate_models(
+    X_train: pd.DataFrame,
+    X_test: pd.DataFrame,
+    y_train: pd.Series,
+    y_test: pd.Series,
+    target_name: str,
+    analysis_start: str | None,
+    analysis_end: str | None,
+) -> tuple[Any, list[dict[str, object]]]:
+    """
+    Train all candidate models on the same split and select the best one.
+
+    Primary selection metric: minimum RMSE.
+    Tie-breakers: minimum MAE, then maximum R².
+    """
+    evaluated: list[
+        tuple[
+            str,
+            Any,
+            dict[str, object],
+        ]
+    ] = []
+
+    for algorithm, model in _build_candidate_models().items():
+        started = perf_counter()
+
+        model.fit(
+            X_train,
+            y_train,
+        )
+
+        training_seconds = (
+            perf_counter() - started
+        )
+
+        predictions = model.predict(
+            X_test
+        )
+
+        mae = float(
+            mean_absolute_error(
+                y_test,
+                predictions,
+            )
+        )
+
+        rmse = float(
+            np.sqrt(
+                mean_squared_error(
+                    y_test,
+                    predictions,
+                )
+            )
+        )
+
+        r2 = float(
+            r2_score(
+                y_test,
+                predictions,
+            )
+        )
+
+        row = {
+            "Model": target_name,
+            "Algorithm": algorithm,
+            "MAE": mae,
+            "RMSE": rmse,
+            "R2": r2,
+            "TrainingSeconds": round(
+                training_seconds,
+                4,
+            ),
+            "Selected": False,
+            "SelectionMetric": "RMSE",
+            "TrainRows": len(X_train),
+            "TestRows": len(X_test),
+            "AnalysisStartDate": analysis_start,
+            "AnalysisEndDate": analysis_end,
+        }
+
+        evaluated.append(
+            (
+                algorithm,
+                model,
+                row,
+            )
+        )
+
+    best_algorithm, best_model, _ = min(
+        evaluated,
+        key=lambda item: (
+            safe_float(
+                item[2]["RMSE"],
+                default=float("inf"),
+            ),
+            safe_float(
+                item[2]["MAE"],
+                default=float("inf"),
+            ),
+            -safe_float(
+                item[2]["R2"],
+                default=float("-inf"),
+            ),
+        ),
+    )
+
+    metric_rows: list[
+        dict[str, object]
+    ] = []
+
+    for algorithm, _, row in evaluated:
+        row["Selected"] = (
+            algorithm == best_algorithm
+        )
+        metric_rows.append(row)
+
+    return best_model, metric_rows
+
+
+def _build_feature_importance_dataframe(
+    model: Any,
+    feature_cols: Sequence[str],
+    target_name: str,
+    algorithm: str,
+    analysis_start: str | None,
+    analysis_end: str | None,
+) -> pd.DataFrame:
+    """Create a normalized feature-importance table for the selected model."""
+    importances = getattr(
+        model,
+        "feature_importances_",
+        None,
+    )
+
+    if importances is None:
+        importances = np.zeros(
+            len(feature_cols),
+            dtype=float,
+        )
+
+    return pd.DataFrame(
+        {
+            "Feature": list(feature_cols),
+            "Importance": np.asarray(
+                importances,
+                dtype=float,
+            ),
+            "Model": target_name,
+            "Algorithm": algorithm,
+            "Selected": True,
+            "AnalysisStartDate": analysis_start,
+            "AnalysisEndDate": analysis_end,
+        }
+    )
+
+
 def train_and_validate_models(
     train_df: pd.DataFrame,
 ) -> Tuple[
-    RandomForestRegressor,
-    RandomForestRegressor,
+    Any,
+    Any,
     List[str],
     pd.DataFrame,
     pd.DataFrame,
 ]:
-    """Train conversion and revenue prediction models."""
+    """
+    Benchmark Random Forest, XGBoost and LightGBM.
+
+    The three algorithms use the same train/test split. Revenue and
+    conversion targets are evaluated independently, and the model with
+    the lowest RMSE is selected for each target.
+    """
     if train_df.empty:
         raise ValueError(
             "Training dataframe is empty."
@@ -304,9 +503,11 @@ def train_and_validate_models(
     )
 
     X = model_df[feature_cols]
+
     y_conv = model_df[
         "Target_Conversions_Next"
     ]
+
     y_rev = model_df[
         "Target_Revenue_Next"
     ]
@@ -326,121 +527,94 @@ def train_and_validate_models(
         random_state=42,
     )
 
-    model_conv = RandomForestRegressor(
-        n_estimators=250,
-        max_depth=8,
-        min_samples_leaf=2,
-        random_state=42,
-        n_jobs=-1,
+    (
+        model_conv,
+        conversion_metrics,
+    ) = _evaluate_candidate_models(
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train_c,
+        y_test=y_test_c,
+        target_name="Conversions",
+        analysis_start=analysis_start,
+        analysis_end=analysis_end,
     )
 
-    model_rev = RandomForestRegressor(
-        n_estimators=250,
-        max_depth=8,
-        min_samples_leaf=2,
-        random_state=42,
-        n_jobs=-1,
-    )
-
-    model_conv.fit(
-        X_train,
-        y_train_c,
-    )
-
-    model_rev.fit(
-        X_train,
-        y_train_r,
-    )
-
-    pred_conv = model_conv.predict(
-        X_test
-    )
-
-    pred_rev = model_rev.predict(
-        X_test
+    (
+        model_rev,
+        revenue_metrics,
+    ) = _evaluate_candidate_models(
+        X_train=X_train,
+        X_test=X_test,
+        y_train=y_train_r,
+        y_test=y_test_r,
+        target_name="Revenue",
+        analysis_start=analysis_start,
+        analysis_end=analysis_end,
     )
 
     metrics_df = pd.DataFrame(
-        [
-            {
-                "Model": "Conversions",
-                "MAE": float(
-                    mean_absolute_error(
-                        y_test_c,
-                        pred_conv,
-                    )
-                ),
-                "RMSE": float(
-                    np.sqrt(
-                        mean_squared_error(
-                            y_test_c,
-                            pred_conv,
-                        )
-                    )
-                ),
-                "R2": float(
-                    r2_score(
-                        y_test_c,
-                        pred_conv,
-                    )
-                ),
-                "TrainRows": len(X_train),
-                "TestRows": len(X_test),
-                "AnalysisStartDate": analysis_start,
-                "AnalysisEndDate": analysis_end,
-            },
-            {
-                "Model": "Revenue",
-                "MAE": float(
-                    mean_absolute_error(
-                        y_test_r,
-                        pred_rev,
-                    )
-                ),
-                "RMSE": float(
-                    np.sqrt(
-                        mean_squared_error(
-                            y_test_r,
-                            pred_rev,
-                        )
-                    )
-                ),
-                "R2": float(
-                    r2_score(
-                        y_test_r,
-                        pred_rev,
-                    )
-                ),
-                "TrainRows": len(X_train),
-                "TestRows": len(X_test),
-                "AnalysisStartDate": analysis_start,
-                "AnalysisEndDate": analysis_end,
-            },
-        ]
+        conversion_metrics
+        + revenue_metrics
     )
 
-    importance_conv = pd.DataFrame(
-        {
-            "Feature": feature_cols,
-            "Importance": (
-                model_conv.feature_importances_
-            ),
-            "Model": "Conversions",
-            "AnalysisStartDate": analysis_start,
-            "AnalysisEndDate": analysis_end,
-        }
+    metrics_df = (
+        metrics_df
+        .sort_values(
+            [
+                "Model",
+                "RMSE",
+                "MAE",
+            ],
+            ascending=[
+                True,
+                True,
+                True,
+            ],
+        )
+        .reset_index(drop=True)
     )
 
-    importance_rev = pd.DataFrame(
-        {
-            "Feature": feature_cols,
-            "Importance": (
-                model_rev.feature_importances_
+    selected_conv_algorithm = str(
+        metrics_df.loc[
+            (
+                (metrics_df["Model"] == "Conversions")
+                & metrics_df["Selected"]
             ),
-            "Model": "Revenue",
-            "AnalysisStartDate": analysis_start,
-            "AnalysisEndDate": analysis_end,
-        }
+            "Algorithm",
+        ].iloc[0]
+    )
+
+    selected_rev_algorithm = str(
+        metrics_df.loc[
+            (
+                (metrics_df["Model"] == "Revenue")
+                & metrics_df["Selected"]
+            ),
+            "Algorithm",
+        ].iloc[0]
+    )
+
+    importance_conv = (
+        _build_feature_importance_dataframe(
+            model=model_conv,
+            feature_cols=feature_cols,
+            target_name="Conversions",
+            algorithm=selected_conv_algorithm,
+            analysis_start=analysis_start,
+            analysis_end=analysis_end,
+        )
+    )
+
+    importance_rev = (
+        _build_feature_importance_dataframe(
+            model=model_rev,
+            feature_cols=feature_cols,
+            target_name="Revenue",
+            algorithm=selected_rev_algorithm,
+            analysis_start=analysis_start,
+            analysis_end=analysis_end,
+        )
     )
 
     feature_importance_df = (
@@ -470,15 +644,29 @@ def train_and_validate_models(
 def calculate_model_r2(
     metrics_df: pd.DataFrame,
 ) -> float:
-    """Calculate the average model R²."""
+    """Calculate average R² using selected models when available."""
     if (
         metrics_df.empty
         or "R2" not in metrics_df.columns
     ):
         return 0.0
 
+    selected_df = metrics_df
+
+    if "Selected" in metrics_df.columns:
+        selected_mask = (
+            metrics_df["Selected"]
+            .fillna(False)
+            .astype(bool)
+        )
+
+        if selected_mask.any():
+            selected_df = metrics_df.loc[
+                selected_mask
+            ]
+
     r2_values = pd.to_numeric(
-        metrics_df["R2"],
+        selected_df["R2"],
         errors="coerce",
     ).dropna()
 
@@ -542,10 +730,179 @@ def _prepare_prediction_input(
     return X_input
 
 
+
+def _model_algorithm_name(model: Any) -> str:
+    """Return a stable human-readable algorithm name."""
+    name = model.__class__.__name__
+    mapping = {
+        "RandomForestRegressor": "Random Forest",
+        "XGBRegressor": "XGBoost",
+        "LGBMRegressor": "LightGBM",
+    }
+    return mapping.get(name, name)
+
+
+def _build_shap_explainer(model: Any) -> Any | None:
+    """Build a SHAP TreeExplainer without making SHAP a hard failure point."""
+    try:
+        import shap
+
+        return shap.TreeExplainer(model)
+    except Exception:
+        return None
+
+
+def _extract_top_shap_drivers(
+    explainer: Any | None,
+    model_input: pd.DataFrame,
+    feature_cols: Sequence[str],
+    top_n: int = 3,
+) -> list[dict[str, object]]:
+    """Return the strongest local SHAP contributions for one prediction."""
+    if explainer is None or model_input.empty:
+        return []
+
+    try:
+        explanation = explainer(model_input)
+        values = np.asarray(explanation.values, dtype=float)
+
+        if values.ndim == 3:
+            values = values[:, :, 0]
+
+        if values.ndim == 2:
+            shap_values = values[0]
+        else:
+            shap_values = values.reshape(-1)
+
+        feature_values = model_input.iloc[0].to_numpy(dtype=float)
+
+        driver_rows: list[dict[str, object]] = []
+        for index, feature in enumerate(feature_cols):
+            if index >= len(shap_values):
+                break
+
+            shap_value = safe_float(shap_values[index])
+            feature_value = safe_float(feature_values[index])
+
+            driver_rows.append(
+                {
+                    "Feature": str(feature),
+                    "FeatureValue": feature_value,
+                    "SHAPValue": shap_value,
+                    "AbsSHAPValue": abs(shap_value),
+                    "Direction": (
+                        "Positive"
+                        if shap_value > 0
+                        else "Negative"
+                        if shap_value < 0
+                        else "Neutral"
+                    ),
+                }
+            )
+
+        driver_rows.sort(
+            key=lambda row: safe_float(row["AbsSHAPValue"]),
+            reverse=True,
+        )
+
+        return driver_rows[: max(int(top_n), 0)]
+
+    except Exception:
+        return []
+
+
+def _format_shap_drivers(
+    drivers: Sequence[dict[str, object]],
+) -> str:
+    """Format local SHAP evidence for dashboards and LLM prompts."""
+    if not drivers:
+        return ""
+
+    parts: list[str] = []
+    for driver in drivers:
+        parts.append(
+            f"{driver.get('Feature', '')} "
+            f"({driver.get('Direction', 'Neutral')}, "
+            f"SHAP={safe_float(driver.get('SHAPValue', 0.0)):.4f})"
+        )
+
+    return "; ".join(parts)
+
+
+def _attach_driver_columns(
+    row: dict[str, object],
+    prefix: str,
+    drivers: Sequence[dict[str, object]],
+) -> None:
+    """Attach structured Top-3 SHAP fields to one scenario row."""
+    row[f"{prefix}TopDrivers"] = _format_shap_drivers(drivers)
+
+    for rank in range(1, 4):
+        driver = drivers[rank - 1] if rank <= len(drivers) else {}
+        row[f"{prefix}Driver{rank}Feature"] = driver.get("Feature", "")
+        row[f"{prefix}Driver{rank}FeatureValue"] = safe_float(
+            driver.get("FeatureValue", 0.0)
+        )
+        row[f"{prefix}Driver{rank}SHAP"] = safe_float(
+            driver.get("SHAPValue", 0.0)
+        )
+        row[f"{prefix}Driver{rank}Direction"] = driver.get(
+            "Direction", ""
+        )
+
+
+def build_shap_explanation_table(
+    best_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """Convert selected-scenario SHAP driver columns into an audit table."""
+    if best_df.empty:
+        return pd.DataFrame()
+
+    rows: list[dict[str, object]] = []
+
+    for _, source_row in best_df.iterrows():
+        for target, prefix, algorithm_column in [
+            ("Conversions", "Conversion", "ConversionModelAlgorithm"),
+            ("Revenue", "Revenue", "RevenueModelAlgorithm"),
+        ]:
+            for rank in range(1, 4):
+                feature = str(
+                    source_row.get(f"{prefix}Driver{rank}Feature", "") or ""
+                ).strip()
+
+                if not feature:
+                    continue
+
+                rows.append(
+                    {
+                        "CampaignId": source_row.get("CampaignId", 0),
+                        "Campaign": source_row.get("Campaign", ""),
+                        "Target": target,
+                        "Algorithm": source_row.get(algorithm_column, ""),
+                        "Feature": feature,
+                        "FeatureValue": safe_float(
+                            source_row.get(
+                                f"{prefix}Driver{rank}FeatureValue", 0.0
+                            )
+                        ),
+                        "SHAPValue": safe_float(
+                            source_row.get(
+                                f"{prefix}Driver{rank}SHAP", 0.0
+                            )
+                        ),
+                        "Direction": source_row.get(
+                            f"{prefix}Driver{rank}Direction", ""
+                        ),
+                        "Rank": rank,
+                    }
+                )
+
+    return pd.DataFrame(rows)
+
 def simulate_budget_scenarios(
     latest_df: pd.DataFrame,
-    model_conv: RandomForestRegressor,
-    model_rev: RandomForestRegressor,
+    model_conv: Any,
+    model_rev: Any,
     feature_cols: List[str],
 ) -> pd.DataFrame:
     """Generate safe budget scenarios for every campaign."""
@@ -558,6 +915,11 @@ def simulate_budget_scenarios(
         )
 
     results: list[dict[str, object]] = []
+
+    conversion_explainer = _build_shap_explainer(model_conv)
+    revenue_explainer = _build_shap_explainer(model_rev)
+    conversion_algorithm = _model_algorithm_name(model_conv)
+    revenue_algorithm = _model_algorithm_name(model_rev)
 
     for _, source_row in latest_df.iterrows():
         row = source_row.copy()
@@ -730,8 +1092,23 @@ def simulate_budget_scenarios(
                     / scenario_spend
                 )
 
-            results.append(
-                {
+            conversion_drivers = _extract_top_shap_drivers(
+                conversion_explainer,
+                X_input,
+                feature_cols,
+                top_n=3,
+            )
+
+            revenue_drivers = _extract_top_shap_drivers(
+                revenue_explainer,
+                X_input,
+                feature_cols,
+                top_n=3,
+            )
+
+            result_row: dict[str, object] = {
+                    "ConversionModelAlgorithm": conversion_algorithm,
+                    "RevenueModelAlgorithm": revenue_algorithm,
                     "CampaignId": row.get(
                         "CampaignId",
                         0,
@@ -810,7 +1187,19 @@ def simulate_budget_scenarios(
                         "",
                     ),
                 }
+
+            _attach_driver_columns(
+                result_row,
+                "Conversion",
+                conversion_drivers,
             )
+            _attach_driver_columns(
+                result_row,
+                "Revenue",
+                revenue_drivers,
+            )
+
+            results.append(result_row)
 
     return pd.DataFrame(results)
 

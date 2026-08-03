@@ -472,12 +472,17 @@ def test_get_feature_columns_returns_expected_features():
     assert isinstance(result, list)
     assert len(result) > 20
 
-    assert "CampaignId" in result
+    # CampaignId is required for grouping and lag calculations,
+    # but it must never be passed to the predictive model as a feature.
+    assert "CampaignId" not in result
+
     assert "Spend" in result
     assert "ROAS" in result
     assert "ExpectedROASMultiplier" in result
     assert "Spend_lag_1" in result
     assert "Spend_lag_7_avg" in result
+    assert "Clicks_lag_7_avg" in result
+    assert "Conversions_lag_7_avg" in result
     assert "ConversionValue_lag_7_avg" in result
 
 

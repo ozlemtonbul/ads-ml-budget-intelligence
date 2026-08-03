@@ -3,6 +3,7 @@ import pandas as pd
 from src.models.budget_optimizer import (
     add_campaign_type,
     classify_campaign_type,
+    build_shap_explanation_table,
     choose_optimal_scenario,
     simulate_budget_scenarios,
 )
@@ -86,3 +87,30 @@ def test_zero_spend_scenario_has_zero_predictions():
     assert (result["PredictedRevenue"] == 0.0).all()
     assert (result["PredictedProfit"] == 0.0).all()
     assert (result["PredictedROAS"] == 0.0).all()
+
+
+def test_build_shap_explanation_table():
+    best_df = pd.DataFrame(
+        {
+            "CampaignId": [1],
+            "Campaign": ["Test Campaign"],
+            "ConversionModelAlgorithm": ["XGBoost"],
+            "RevenueModelAlgorithm": ["XGBoost"],
+            "ConversionDriver1Feature": ["ROAS"],
+            "ConversionDriver1FeatureValue": [4.2],
+            "ConversionDriver1SHAP": [0.8],
+            "ConversionDriver1Direction": ["Positive"],
+            "RevenueDriver1Feature": ["Spend"],
+            "RevenueDriver1FeatureValue": [100.0],
+            "RevenueDriver1SHAP": [-25.0],
+            "RevenueDriver1Direction": ["Negative"],
+        }
+    )
+
+    result = build_shap_explanation_table(best_df)
+
+    assert len(result) == 2
+    assert set(result["Target"]) == {"Conversions", "Revenue"}
+    assert set(result["Algorithm"]) == {"XGBoost"}
+    assert set(result["Feature"]) == {"ROAS", "Spend"}
+    assert set(result["Rank"]) == {1}

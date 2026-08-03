@@ -31,6 +31,7 @@ from src.features.reporting import (
 from src.models.budget_optimizer import (
     add_baseline_uplift,
     add_campaign_type,
+    build_shap_explanation_table,
     choose_optimal_scenario,
     simulate_budget_scenarios,
     train_and_validate_models,
@@ -40,6 +41,7 @@ from src.recommendations.campaign_planner import (
 )
 from src.recommendations.recommendation_engine import (
     add_budget_spike_flag,
+    add_explainability_reason,
     apply_confidence_guardrail,
     build_action_recommendation,
     build_confidence_scores,
@@ -560,6 +562,10 @@ def main() -> None:
             sim_df,
         )
 
+        shap_explanations_df = build_shap_explanation_table(
+            best_df
+        )
+
         # ----------------------------------------------------
         # Existing campaign recommendations
         # ----------------------------------------------------
@@ -594,6 +600,10 @@ def main() -> None:
         )
 
         recommendation_df = add_budget_spike_flag(
+            recommendation_df
+        )
+
+        recommendation_df = add_explainability_reason(
             recommendation_df
         )
 
@@ -655,6 +665,12 @@ def main() -> None:
             date_to,
         )
 
+        shap_explanations_df = add_analysis_period(
+            shap_explanations_df,
+            date_from,
+            date_to,
+        )
+
         # ----------------------------------------------------
         # Portfolio commentary
         # ----------------------------------------------------
@@ -705,6 +721,9 @@ def main() -> None:
             ),
             "ads_feature_importance": (
                 feature_importance_df
+            ),
+            "ads_shap_explanations": (
+                shap_explanations_df
             ),
             **common_outputs,
         }

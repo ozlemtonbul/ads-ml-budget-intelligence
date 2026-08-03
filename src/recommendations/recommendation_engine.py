@@ -796,6 +796,48 @@ def apply_confidence_guardrail(
     return result_df
 
 
+
+def add_explainability_reason(
+    recommendation_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """Add evidence-grounded, non-causal explanation text to recommendations."""
+    if recommendation_df.empty:
+        return recommendation_df.copy()
+
+    result_df = recommendation_df.copy()
+
+    def build_reason(row: pd.Series) -> str:
+        revenue_drivers = str(row.get("RevenueTopDrivers", "") or "").strip()
+        conversion_drivers = str(
+            row.get("ConversionTopDrivers", "") or ""
+        ).strip()
+        decision_reason = str(
+            row.get("RecommendationReason", "") or ""
+        ).strip()
+
+        parts: list[str] = []
+        if revenue_drivers:
+            parts.append(f"Revenue model drivers: {revenue_drivers}.")
+        if conversion_drivers:
+            parts.append(f"Conversion model drivers: {conversion_drivers}.")
+        if decision_reason:
+            parts.append(f"Decision rule: {decision_reason}")
+
+        if not parts:
+            return (
+                "No SHAP driver evidence was available. "
+                "Use the deterministic recommendation reason and confidence level."
+            )
+
+        return " ".join(parts)
+
+    result_df["WhyThisRecommendation"] = result_df.apply(
+        build_reason,
+        axis=1,
+    )
+
+    return result_df
+
 def build_portfolio_allocation(
     recommendation_df: pd.DataFrame,
 ) -> pd.DataFrame:
@@ -997,6 +1039,11 @@ def build_recommendation_summary(
         "BudgetSpike",
         "BudgetSpikeWarning",
         "RecommendationReason",
+        "ConversionModelAlgorithm",
+        "RevenueModelAlgorithm",
+        "ConversionTopDrivers",
+        "RevenueTopDrivers",
+        "WhyThisRecommendation",
         "ExecutiveCommentary",
     ]
 
@@ -1460,6 +1507,14 @@ Confidence level: {confidence_level}
 Decision basis: {decision_basis}
 Recommended action: {recommended_action}
 Recommendation reason: {recommendation_reason}
+Revenue model evidence (SHAP): {str(row.get('RevenueTopDrivers', '') or '').strip()}
+Conversion model evidence (SHAP): {str(row.get('ConversionTopDrivers', '') or '').strip()}
+Why this recommendation: {str(row.get('WhyThisRecommendation', '') or '').strip()}
+
+Important explainability rules:
+- Use only the supplied model evidence and decision-rule information.
+- Do not invent additional model drivers.
+- SHAP values describe contribution to the model prediction, not real-world causality.
 
 Executive commentary:
 """.strip()

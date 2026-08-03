@@ -107,6 +107,7 @@ def get_turkey_public_holidays(year: int) -> Dict[str, str]:
                 for holiday_date, name in tr_holidays.items()
             }
         )
+
     except Exception:
         holiday_map.update(
             _fallback_fixed_holidays(year)
@@ -134,6 +135,7 @@ def build_holiday_map(
         date_from,
         errors="coerce",
     )
+
     end = pd.to_datetime(
         date_to,
         errors="coerce",
@@ -679,8 +681,15 @@ def prepare_training_data(
 
 
 def get_feature_columns() -> List[str]:
+    """
+    Return predictive ML features.
+
+    Identifier columns such as CampaignId are intentionally excluded
+    from model training to prevent identifier leakage and memorization.
+    CampaignId remains available elsewhere for grouping, lag features,
+    joins, reporting, and campaign-level explanations.
+    """
     return [
-        "CampaignId",
         "Spend",
         "Impressions",
         "Clicks",

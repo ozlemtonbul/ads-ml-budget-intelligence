@@ -5,6 +5,7 @@ import pandas as pd
 
 from src.recommendations.recommendation_engine import (
     add_budget_spike_flag,
+    add_explainability_reason,
     apply_confidence_guardrail,
     build_action_recommendation,
     build_confidence_scores,
@@ -348,3 +349,49 @@ def test_generate_portfolio_summary_without_api_key():
     assert "Portfolio contains 1 campaigns" in result
     assert "ROAS target of 3.0" in result
     assert "top category is Shoes" in result
+
+def test_add_explainability_reason_uses_shap_and_decision_rule():
+    df = pd.DataFrame(
+        {
+            "Campaign": ["Test Campaign"],
+            "RevenueTopDrivers": ["ROAS (Positive, SHAP=0.8000)"],
+            "ConversionTopDrivers": ["Spend (Negative, SHAP=-0.2000)"],
+            "RecommendationReason": ["Predicted ROAS meets the target."],
+        }
+    )
+
+    result = add_explainability_reason(df)
+    text = result.loc[0, "WhyThisRecommendation"]
+
+    assert "Revenue model drivers" in text
+    assert "Conversion model drivers" in text
+    assert "Decision rule" in text
+
+
+def test_llm_prompt_contains_shap_evidence_and_non_causality_rule():
+    row = pd.Series(
+        {
+            "Campaign": "Brand Search",
+            "CampaignId": 1,
+            "CampaignType": "Brand",
+            "CurrentSpend": 100.0,
+            "RecommendedBudget": 120.0,
+            "BudgetChangePct": 20.0,
+            "PredictedROAS": 4.0,
+            "PredictedRevenue": 500.0,
+            "PredictedProfit": 380.0,
+            "ConfidenceLevel": "High",
+            "DecisionBasis": "Model + business rules",
+            "RecommendedAction": "Increase Budget",
+            "RecommendationReason": "Predicted ROAS meets the target.",
+            "RevenueTopDrivers": "ROAS (Positive, SHAP=0.8000)",
+            "ConversionTopDrivers": "Spend (Negative, SHAP=-0.2000)",
+            "WhyThisRecommendation": "Evidence grounded explanation",
+        }
+    )
+
+    prompt = build_llm_campaign_prompt(row=row, target_roas=3.0)
+
+    assert "Revenue model evidence (SHAP)" in prompt
+    assert "Conversion model evidence (SHAP)" in prompt
+    assert "not real-world causality" in prompt

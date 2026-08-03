@@ -4,14 +4,14 @@
 | Ads 2023/2024 · 2024/2025 · 2026 YTD | [View Dashboard →](https://ozlemtonbul.github.io/dashboards/ads_dashboard.html) |
 | AI / ML / LLM Ads Budget Intelligence AI Agent Demo | [Launch Public Demo →](https://ads-ai-ml-llm-intelligence.streamlit.app/) |
 
-# # Ads Budget Intelligence AI Agent
+# Ads Budget Intelligence AI Agent
 
 > **Enterprise AI-Powered Marketing Decision Intelligence Platform**
 
 ![Python](https://img.shields.io/badge/Python-3.13-blue)
 ![Google Ads API](https://img.shields.io/badge/Google_Ads_API-Integrated-success)
 ![GA4](https://img.shields.io/badge/GA4-Integrated-success)
-![Machine Learning](https://img.shields.io/badge/ML-Random_Forest-orange)
+![Machine Learning](https://img.shields.io/badge/ML-RF%20%7C%20XGBoost%20%7C%20LightGBM-orange)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supported-blue)
 ![Docker](https://img.shields.io/badge/Docker-Ready-2496ED)
 ![Pytest](https://img.shields.io/badge/Tested_with-Pytest-success)
@@ -32,11 +32,14 @@ Unlike traditional reporting solutions, the platform predicts future campaign pe
 
 - Enterprise-ready modular architecture
 - Google Ads API integration
-- Google Analytics 4 integration
-- Feature Engineering pipeline
-- Random Forest prediction models
-- Budget optimization engine
-- Portfolio allocation engine
+- Google Analytics 4 (GA4) integration
+- Advanced Feature Engineering pipeline
+- Multi-model Machine Learning Benchmarking (Random Forest, XGBoost, LightGBM)
+- Automatic Best Model Selection
+- SHAP Explainable AI (Top-3 Prediction Drivers)
+- Evidence-Based Recommendation Engine
+- Budget Optimization Engine
+- Portfolio Budget Allocation Engine
 - Provider-independent Multi-LLM architecture
 - Anthropic Claude support
 - OpenAI GPT support
@@ -44,14 +47,14 @@ Unlike traditional reporting solutions, the platform predicts future campaign pe
 - AI-generated executive commentary
 - Rule-based / deterministic AI fallback
 - LLM usage guard and configurable cost controls
+- Identifier Leakage Prevention
 - Interactive Streamlit decision dashboard
 - Public anonymized demo deployment
 - PostgreSQL integration
 - Docker support
 - GitHub Actions CI
-- **203 automated tests passing**
+- **206 automated tests passing**
 - Power BI ready
-
 ---
 
 # Business Problem
@@ -96,10 +99,10 @@ Key business outcomes include:
                  Google Ads Extractor
                            │
                            ▼
-                  Google Analytics 4
+                Google Analytics 4 API
                            │
                            ▼
-                   GA4 Data Extractor
+                  GA4 Data Extractor
                            │
                            ▼
                  Feature Engineering
@@ -113,37 +116,50 @@ Key business outcomes include:
                  Training Dataset Builder
                            │
                            ▼
-                Random Forest ML Models
-          ┌────────────────┴────────────────┐
-          ▼                                 ▼
- Revenue Prediction               Conversion Prediction
-          └────────────────┬────────────────┘
-                           │
-                           ▼
-             Budget Scenario Simulation
-                           │
-                           ▼
-              Budget Optimization Engine
-                           │
-                           ▼
-               Recommendation Engine
-                           │
-                           ▼
-                     LLM Manager
-                           │
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-   Anthropic Claude    OpenAI GPT    Google Gemini
-          └────────────────┼────────────────┘
-                           │
-                           ▼
-               Executive Commentary
-                           │
-          ┌────────────────┼────────────────┐
-          ▼                ▼                ▼
-     CSV Reports      PostgreSQL      Power BI
+            Multi-Model Machine Learning
+      ┌──────────────┬──────────────┬──────────────┐
+      ▼              ▼              ▼
+Random Forest     XGBoost       LightGBM
+      └──────────────┼──────────────┘
+                     ▼
+         Model Benchmarking (MAE • RMSE • R²)
+                     │
+                     ▼
+      Automatic Best Model Selection
+                     │
+         ┌───────────┴───────────┐
+         ▼                       ▼
+ Revenue Prediction     Conversion Prediction
+         └───────────┬───────────┘
+                     ▼
+          SHAP Explainable AI
+                     │
+      Top-3 Prediction Drivers
+                     │
+                     ▼
+       Budget Scenario Simulation
+                     │
+                     ▼
+      Budget Optimization Engine
+                     │
+                     ▼
+     Evidence-Based Recommendation Engine
+                     │
+                     ▼
+               Multi-LLM Manager
+                     │
+      ┌──────────────┼──────────────┐
+      ▼              ▼              ▼
+ Anthropic       OpenAI GPT     Google Gemini
+   Claude
+      └──────────────┼──────────────┘
+                     ▼
+ Executive Commentary (AI / Deterministic)
+                     │
+      ┌──────────────┼──────────────┐
+      ▼              ▼              ▼
+ CSV Reports     PostgreSQL     Power BI
 ```
-
 # Enterprise Architecture
 
 The project follows a modular enterprise architecture where each business capability is isolated into an independent Python module.
@@ -193,21 +209,23 @@ src/
 
 | Layer | Technology |
 |--------|------------|
-| Programming | Python 3.13 |
+| Programming Language | Python 3.13 |
 | Data Processing | Pandas, NumPy |
-| Machine Learning | Scikit-learn |
-| ML Algorithm | Random Forest Regression |
-| APIs | Google Ads API |
-| Analytics | Google Analytics Data API |
+| Machine Learning | Scikit-learn, XGBoost, LightGBM |
+| Explainable AI | SHAP |
+| Machine Learning Algorithms | Random Forest, XGBoost, LightGBM |
+| Feature Engineering | Custom Marketing Feature Pipeline |
+| APIs | Google Ads API, Google Analytics Data API |
 | AI | Multi-LLM (Anthropic Claude • OpenAI GPT • Google Gemini) |
+| LLM Management | Provider Manager + Usage Guard |
 | Database | PostgreSQL |
 | Containerization | Docker |
-| Interactive App | Streamlit |
-| Reporting | Power BI |
-| Testing | Pytest |
-| CI | GitHub Actions |
+| Interactive Dashboard | Streamlit |
+| Visualization | Plotly |
+| Reporting | CSV, PostgreSQL, Power BI |
+| Testing | Pytest (206 Automated Tests) |
+| CI/CD | GitHub Actions |
 | Version Control | Git + GitHub |
-
 ---
 
 # Project Structure
@@ -417,41 +435,65 @@ These variables improve the predictive capability of the machine learning models
 
 # Machine Learning Pipeline
 
-The project trains two independent regression models.
+The platform benchmarks three independent machine learning regression algorithms using the same training and validation dataset.
 
-## Model 1
+## Machine Learning Algorithms
 
-Predicts:
+The following regression models are trained independently:
+
+- Random Forest Regressor
+- XGBoost Regressor
+- LightGBM Regressor
+
+Each algorithm predicts both:
 
 - Next-period Revenue
-
-Algorithm:
-
-- Random Forest Regressor
-
----
-
-## Model 2
-
-Predicts:
-
 - Next-period Conversions
 
-Algorithm:
+---
 
-- Random Forest Regressor
+## Automatic Model Benchmarking
+
+Every model is automatically evaluated using identical train/test splits.
+
+Evaluation metrics include:
+
+- Mean Absolute Error (MAE)
+- Root Mean Squared Error (RMSE)
+- R² Score
+
+The benchmark results are exported to:
+
+- ads_model_validation_metrics.csv
+
+The platform automatically selects the highest-performing model independently for each prediction target.
+
+Current benchmark:
+
+- Revenue → XGBoost
+- Conversions → XGBoost
+
+This allows the production pipeline to use the most accurate validated model instead of relying on a fixed machine learning algorithm.
 
 ---
 
-## Model Validation
+# Explainable AI (SHAP)
 
-Every model is automatically evaluated using:
+The platform provides transparent machine learning predictions using SHAP (SHapley Additive exPlanations).
 
-- MAE
-- RMSE
-- R² Score
+For every campaign prediction the system automatically:
 
-Validation metrics are exported for monitoring and comparison.
+- Calculates SHAP values
+- Identifies the Top-3 prediction drivers
+- Explains why each prediction was generated
+- Supplies evidence-based explanations to the recommendation engine
+- Supports both deterministic and LLM-generated executive commentary
+
+Generated output:
+
+- ads_shap_explanations.csv
+
+Campaign identifiers are intentionally excluded from predictive model training to prevent identifier leakage while remaining available for grouping, lag feature generation and reporting.
 
 ---
 
@@ -479,14 +521,20 @@ The optimization engine automatically selects the highest-scoring scenario while
 
 # Recommendation Engine
 
-Recommendations are generated using both machine learning predictions and deterministic business rules.
+Recommendations are generated using:
 
-Possible actions:
+- Machine Learning Predictions
+- SHAP Explainability
+- Deterministic Business Rules
+
+Possible actions include:
 
 - Increase Budget
 - Reduce Budget
 - Maintain Budget
 - Review Campaign
+
+Every recommendation is supported by explainable prediction evidence rather than model output alone.
 
 ---
 
@@ -498,11 +546,12 @@ Each recommendation receives a confidence label:
 - Medium
 - Low
 
-Confidence is based on:
+Confidence is calculated using:
 
-- Historical campaign data
-- Model performance
+- Historical campaign behaviour
 - Prediction stability
+- Validation performance
+- Selected model confidence
 
 ---
 
@@ -515,7 +564,7 @@ Campaigns are ranked according to:
 - ROAS
 - Business Priority
 
-This allows budget allocation decisions to be made at portfolio level instead of campaign level.
+Portfolio optimization enables budget allocation decisions across all campaigns instead of evaluating campaigns individually.
 
 ---
 
@@ -523,13 +572,20 @@ This allows budget allocation decisions to be made at portfolio level instead of
 
 The platform supports provider-independent AI-generated executive commentary through a centralized Multi-LLM Manager.
 
-Supported Large Language Model (LLM) providers include:
+Supported providers:
 
 - Anthropic Claude
 - OpenAI GPT
 - Google Gemini
 
-The Recommendation Engine generates structured business prompts, while the LLM Manager routes requests to the selected provider based on the environment configuration.
+The Recommendation Engine generates structured business prompts using:
+
+- Machine Learning Predictions
+- Budget Optimization Results
+- Portfolio Analysis
+- SHAP Explainability
+
+The Multi-LLM Manager routes requests to the selected provider defined by the project configuration.
 
 Generated commentary includes:
 
@@ -540,34 +596,37 @@ Generated commentary includes:
 - Business Risk Assessment
 - Optimization Opportunities
 
-Only one LLM provider is active at runtime. The active provider is selected using the project configuration.
+Only one LLM provider is active at runtime.
 
-If no API key is configured or the selected provider is unavailable, the platform automatically falls back to deterministic rule-based executive commentary, ensuring uninterrupted recommendation generation.
+If no API key is configured, or live generation is disabled, the platform automatically falls back to deterministic executive commentary without interrupting recommendation generation.
 
-The objective is to translate machine learning predictions and optimization results into clear, business-friendly insights for marketing managers, analysts, and executive stakeholders.
 ---
 
 # LLM Cost & Usage Controls
 
-Live LLM generation is optional and disabled by default. The analytics, machine learning, optimization, and deterministic recommendation layers remain available without an LLM API key.
+Live LLM generation is optional and disabled by default.
 
-The project includes a dedicated `src/llm/usage_guard.py` layer to reduce accidental API spend during local development. Current configurable controls include:
+Analytics, machine learning, optimization and deterministic recommendations remain fully operational without an LLM API key.
+
+The project includes a dedicated `src/llm/usage_guard.py` layer to control API usage.
+
+Current safeguards include:
 
 - `LLM_ENABLED=false` by default
-- `LLM_PROVIDER=auto` for provider resolution when a single supported API key is configured
-- `LLM_MAX_TOKENS=800` maximum response-token setting
-- `LLM_DAILY_REQUEST_LIMIT=20` maximum successful live LLM requests per day
-- `LLM_USAGE_FILE=./outputs/llm_usage.json` local daily usage counter
-- Automatic blocking of additional live LLM requests when the configured daily limit is reached
-- Safe deterministic fallback when live LLM generation is disabled or unavailable
+- Automatic provider selection (`LLM_PROVIDER=auto`)
+- Configurable maximum response tokens
+- Daily request limits
+- Local usage tracking
+- Automatic request blocking when limits are exceeded
+- Safe deterministic fallback
 
-These values are configuration defaults and can be changed through environment variables for different deployment requirements. API keys are never stored in source control.
+API keys are never stored in source control.
 
 ---
 
 # Interactive Streamlit Dashboard
 
-The project includes an interactive Streamlit decision-support interface for exploring campaign performance and model-driven recommendations.
+The project includes an interactive Streamlit decision-support dashboard.
 
 Dashboard modules include:
 
@@ -576,9 +635,13 @@ Dashboard modules include:
 - Budget Optimizer
 - AI Insights
 - Ask AI
-- Turkish / English interface support
-- Date-range and comparison-period controls
-- Campaign, category, and channel filtering
+- Turkish / English interface
+- Date-range comparison
+- Campaign filtering
+- Category filtering
+- Channel filtering
+- SHAP Explainability
+- Model Benchmark Results
 
 ## Public Demo
 
@@ -596,20 +659,21 @@ The pipeline generates the following deliverables.
 
 | Output | Description |
 |---------|-------------|
-| ads_daily_fact.csv | Daily campaign performance |
-| ads_weekly_campaign_summary.csv | Weekly aggregation |
-| ads_monthly_campaign_summary.csv | Monthly aggregation |
-| ads_category_summary.csv | Category KPIs |
-| ads_product_summary.csv | Product KPIs |
-| ads_budget_scenarios.csv | Budget simulation |
-| ads_budget_optimization_recommendations.csv | Final recommendations |
-| ads_feature_importance.csv | Feature importance |
-| ads_model_validation_metrics.csv | MAE, RMSE, R² |
-| ads_holiday_impact.csv | Holiday analysis |
-| ads_portfolio_budget_allocation.csv | Portfolio optimization |
-| ads_recommendation_summary.csv | Executive recommendations |
-| ads_portfolio_executive_commentary.txt | AI-generated commentary |
-
+| ads_daily_fact.csv | Daily campaign performance dataset |
+| ads_weekly_campaign_summary.csv | Weekly campaign performance summary |
+| ads_monthly_campaign_summary.csv | Monthly campaign performance summary |
+| ads_category_summary.csv | Category-level KPI summary |
+| ads_product_summary.csv | Product-level KPI summary |
+| ads_budget_scenarios.csv | Multi-scenario budget simulation results |
+| ads_budget_optimization_recommendations.csv | Final campaign budget recommendations |
+| ads_feature_importance.csv | Global machine learning feature importance |
+| ads_model_validation_metrics.csv | Multi-model benchmark results (MAE, RMSE, R²) |
+| ads_shap_explanations.csv | SHAP explainability results and Top-3 prediction drivers |
+| ads_holiday_impact.csv | Holiday performance analysis |
+| ads_portfolio_budget_allocation.csv | Portfolio-level budget allocation |
+| ads_recommendation_summary.csv | Executive recommendation summary |
+| ads_portfolio_executive_commentary.txt | AI-generated executive portfolio commentary |
+| ga4_campaign_performance.csv | Google Analytics 4 campaign performance dataset |
 ---
 
 # Enterprise Reporting
@@ -638,8 +702,7 @@ This enables enterprise reporting through:
 - Power BI
 - SQL
 - Dashboards
-Business Intelligence tools
-
+- Business Intelligence tools
 ---
 
 # Performance Characteristics
@@ -830,25 +893,37 @@ Coverage includes:
 - GA4 Extractor
 - Feature Engineering
 - KPI Calculations
+- Multi-model Machine Learning Benchmarking
+- Automatic Best Model Selection
+- Random Forest validation
+- XGBoost validation
+- LightGBM validation
+- SHAP Explainability
+- Top-3 Prediction Driver generation
+- Identifier Leakage Prevention
 - Budget Optimization
 - Recommendation Engine
+- Evidence-Based Recommendation Explanations
 - Reporting
 - PostgreSQL Export
 - Logger
 - Configuration
 - Multi-LLM runtime management
 - LLM daily usage guard / cost-control behavior
+- Deterministic fallback behavior
 - Main Pipeline
 
 ## Current Status
 
-Current status:
-
-- ✅ 203 Automated Tests Passing
+- ✅ 206 Automated Tests Passing
 - ✅ Pytest
 - ✅ Modular Unit Tests
 - ✅ Integration Tests
 - ✅ Mock API Testing
+- ✅ Multi-model Benchmark Validation
+- ✅ Automatic Model Selection Tests
+- ✅ SHAP Explainability Tests
+- ✅ Identifier Leakage Prevention Tests
 - ✅ Provider-independent Multi-LLM Architecture
 - ✅ LLM Manager
 - ✅ Anthropic Claude Provider
@@ -901,10 +976,18 @@ No company credentials or confidential datasets are included in this repository.
 
 - ✅ Google Ads API Integration
 - ✅ Google Analytics 4 Integration
-- ✅ Feature Engineering
-- ✅ Machine Learning Models
+- ✅ Advanced Feature Engineering
+- ✅ Multi-Model Machine Learning Benchmarking
+- ✅ Random Forest Regression
+- ✅ XGBoost Regression
+- ✅ LightGBM Regression
+- ✅ Automatic Best Model Selection
+- ✅ SHAP Explainable AI
+- ✅ Top-3 Prediction Drivers
+- ✅ Identifier Leakage Prevention
 - ✅ Budget Optimization Engine
 - ✅ Recommendation Engine
+- ✅ Evidence-Based Recommendation Engine
 - ✅ Multi-LLM Architecture
 - ✅ LLM Manager
 - ✅ Anthropic Provider
@@ -912,26 +995,27 @@ No company credentials or confidential datasets are included in this repository.
 - ✅ Google Gemini Provider
 - ✅ Rule-based / Deterministic Fallback
 - ✅ LLM Daily Usage Guard
-- ✅ LLM Cost-Control Tests
+- ✅ LLM Cost Controls
 - ✅ AI-Generated Executive Commentary
 - ✅ CSV Export
 - ✅ PostgreSQL Export
 - ✅ Docker Support
 - ✅ Docker Compose
 - ✅ GitHub Actions CI
-- ✅ Automated Testing (203 Tests)
+- ✅ Automated Testing (206 Tests)
 - ✅ Interactive Streamlit Dashboard
 - ✅ Public Anonymized Streamlit Demo
-- ✅ LLM Usage Guard / Cost Controls
 
 ## Planned
 
-- SHAP Explainability
 - Airflow Scheduling
-- XGBoost Models
-- LightGBM Models
 - Real-Time Monitoring
 - Power BI Executive Dashboard
+- Online Model Retraining
+- Model Registry
+- REST API Deployment
+- Kubernetes Deployment
+- Azure / AWS Production Deployment
 
 ---
 
@@ -939,15 +1023,19 @@ No company credentials or confidential datasets are included in this repository.
 
 ## Project Status
 
-Production-ready modular analytics platform with automated testing, Docker support, PostgreSQL integration and CI/CD workflow.
+Production-ready AI-powered marketing decision intelligence platform with automated testing, Docker support, PostgreSQL integration, CI/CD workflow, multi-model machine learning, and explainable AI.
 
 The current version provides:
 
-- Enterprise-ready architecture
-- Modular Python codebase
+- Enterprise-ready modular architecture
 - Automated ETL pipeline
-- Machine Learning forecasting
+- Google Ads + Google Analytics 4 integration
+- Multi-model machine learning benchmarking
+- Automatic best-model selection
+- SHAP Explainable AI
+- Evidence-based recommendation engine
 - Budget optimization
+- Portfolio optimization
 - Provider-independent Multi-LLM architecture
 - AI-generated executive commentary
 - Interactive Streamlit decision dashboard
@@ -956,7 +1044,8 @@ The current version provides:
 - Docker support
 - PostgreSQL integration
 - GitHub Actions CI
-- 203 passing automated tests
+- Power BI-ready outputs
+- 206 passing automated tests
 
 ---
 
@@ -967,7 +1056,13 @@ The current version provides:
 | Python | ✅ |
 | Google Ads API | ✅ |
 | Google Analytics 4 | ✅ |
-| Machine Learning | ✅ |
+| Multi-Model Machine Learning | ✅ |
+| Random Forest | ✅ |
+| XGBoost | ✅ |
+| LightGBM | ✅ |
+| SHAP Explainable AI | ✅ |
+| Automatic Model Selection | ✅ |
+| Recommendation Engine | ✅ |
 | Multi-LLM Support | ✅ |
 | LLM Usage Guard | ✅ |
 | Streamlit Dashboard | ✅ |
@@ -976,23 +1071,26 @@ The current version provides:
 | Docker | ✅ |
 | PostgreSQL | ✅ |
 | GitHub Actions | ✅ |
-| Automated Tests | ✅ 203 Passing |
+| Automated Tests | ✅ 206 Passing |
 | Power BI Ready | ✅ |
 | Enterprise Architecture | ✅ |
+
 ---
 
 # Future Enhancements
 
 Planned future improvements include:
 
-- SHAP model explainability
 - Airflow orchestration
 - Real-time monitoring
-- Additional ML algorithms
+- Online model retraining
+- Model registry
 - REST API deployment
 - Kubernetes deployment
-- Azure / AWS deployment
+- Azure / AWS production deployment
 - Enterprise authentication
+- Advanced forecasting models
+- MLOps pipeline
 
 ---
 
@@ -1000,33 +1098,32 @@ Planned future improvements include:
 
 ## Özlem Tonbul
 
-AI-Powered Decision Intelligence • Business Intelligence • Marketing Analytics • Machine Learning • Data Analytics
+**AI-Powered Decision Intelligence • Business Intelligence • Marketing Analytics • Machine Learning • Data Analytics**
 
-Specializations:
+### Specializations
 
 - Marketing Intelligence
 - Decision Intelligence
 - Business Intelligence
 - Machine Learning
+- Explainable AI
 - Google Ads Analytics
 - Google Analytics 4
 - E-commerce Analytics
 - Operational Analytics
 
- Website: [ozlemtonbul.com](https://ozlemtonbul.com/)
- 
-GitHub: [ozlemtonbul](https://github.com/ozlemtonbul)
+🌐 Website: https://ozlemtonbul.com
 
-LinkedIn:[Özlem Tonbul](https://www.linkedin.com/in/ozlemtonbul/)
+💻 GitHub: https://github.com/ozlemtonbul
+
+💼 LinkedIn: https://www.linkedin.com/in/ozlemtonbul/
 
 ---
-
 
 # License
 
 This repository is provided for portfolio and educational purposes.
 
-Company credentials, proprietary datasets, API keys and confidential business information are intentionally excluded from version control.
+Company credentials, proprietary datasets, API keys, confidential business information and production datasets are intentionally excluded from version control.
 
 © 2026 Özlem Tonbul. All rights reserved.
-
